@@ -30,7 +30,6 @@ export default function HomePage() {
     [],
   );
 
-
   const quickActions = useMemo(
     () => [
       {
@@ -287,10 +286,7 @@ export default function HomePage() {
         <style>{`button{-webkit-tap-highlight-color:transparent;} input{-webkit-tap-highlight-color:transparent;}`}</style>
       </section>
 
-      {/* Bottom Mobile Navbar */}
-      <div className="fixed inset-x-0 bottom-0 z-50">
-        {/* <Navbar activeNav={activeNav} onChange={setActiveNav} /> */}
-      </div>
+      <div className="fixed inset-x-0 bottom-0 z-50"></div>
     </main>
   );
 }

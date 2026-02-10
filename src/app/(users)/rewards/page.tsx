@@ -5,7 +5,6 @@ import UserBanner from "@/components/common/banner";
 export default function HomePage() {
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
-      {/* Background (ธีมเดียวกับหน้าแรก) */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10
@@ -33,19 +32,16 @@ export default function HomePage() {
       <section className="w-full max-w-[520px] relative pb-28">
         {/* Top User Banner */}
         <UserBanner
-          meEndpoint="/api/auth/me" // หรือ "/api/auth/me"
+          meEndpoint="/api/auth/me" 
           onRedeem={() => console.log("redeem")}
           onOpenQR={() => console.log("open qr")}
           onOpenNotifications={() => console.log("open notifications")}
         />
 
-        {/* remove tap highlight */}
+
         <style>{`button{-webkit-tap-highlight-color:transparent;} input{-webkit-tap-highlight-color:transparent;}`}</style>
       </section>
-      {/* Bottom Mobile Navbar */}
-      <div className="fixed inset-x-0 bottom-0 z-50">
-        {/* <Navbar activeNav={activeNav} onChange={setActiveNav} /> */}
-      </div>
+
     </main>
   );
 }
