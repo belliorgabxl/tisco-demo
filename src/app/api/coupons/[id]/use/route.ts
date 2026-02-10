@@ -3,7 +3,6 @@ import { connectDB } from "@/libs/database";
 import { Coupon, CouponStatus } from "@/models/Coupon";
 import { UserCoupon, UserCouponStatus } from "@/models/UserCoupon";
 import { verifyToken } from "@/libs/auth";
-import { Types } from "mongoose";
 import { logCouponUse } from "@/libs/utils/history-service";
 
 export async function POST(
@@ -33,20 +32,17 @@ export async function POST(
 
     await connectDB();
 
-    const { id } = await params;
+    const { id } = await params; // id is now uniqueCode
     const userId = decoded.userId;
+    const uniqueCode = id;
 
-    if (!Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid user coupon ID" },
-        { status: 400 },
-      );
-    }
-
-    const userCoupon = await UserCoupon.findById(id).populate("couponId");
+    // Find UserCoupon by uniqueCode instead of _id
+    const userCoupon = await UserCoupon.findOne({ uniqueCode }).populate(
+      "couponId",
+    );
     if (!userCoupon) {
       return NextResponse.json(
-        { success: false, message: "User coupon not found" },
+        { success: false, message: "Coupon not found with this unique code" },
         { status: 404 },
       );
     }
