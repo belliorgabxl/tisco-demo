@@ -16,7 +16,7 @@ export default function Navbar({
   return (
     <div className="mx-auto w-full max-w-[520px] px-4 pb-4">
       <div
-        className="rounded-3xl border border-white/15 bg-white/10 px-2 py-2 backdrop-blur-xl
+        className="rounded-3xl border border-white/15 bg-white/15 px-2 py-2 backdrop-blur-xl
           shadow-[0_18px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]"
       >
         <div className="grid grid-cols-5">

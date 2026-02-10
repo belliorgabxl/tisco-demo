@@ -19,12 +19,13 @@ import {
 import { formatNumber } from "@/libs/utils/format";
 import { NavKey } from "@/resource/constant";
 import Navbar from "@/components/nav/nav-bar";
+import UserBanner from "@/components/common/banner";
 
 export default function HomePage() {
   const user = useMemo(
     () => ({
       name: "Gabel",
-      tier: "ROYALTY",
+      tier: "Supreme",
       points: 12520,
       memberNo: "JP-1049-2391",
       avatarUrl: "/data/person-user.png",
@@ -37,22 +38,22 @@ export default function HomePage() {
   const quickActions = useMemo(
     () => [
       {
-        icon: <QrCode className="h-5 w-5" />,
+        icon: <QrCode className="h-5 w-5 text-blue-900" />,
         title: "My QR",
         subtitle: "สแกนรับสิทธิ์",
       },
       {
-        icon: <Gift className="h-5 w-5" />,
+        icon: <Gift className="h-5 w-5 text-blue-900" />,
         title: "Redeem",
         subtitle: "แลกของรางวัล",
       },
       {
-        icon: <Wallet className="h-5 w-5" />,
+        icon: <Wallet className="h-5 w-5 text-blue-900" />,
         title: "Wallet",
         subtitle: "ดูเครดิต/แต้ม",
       },
       {
-        icon: <Receipt className="h-5 w-5" />,
+        icon: <Receipt className="h-5 w-5 text-blue-900" />,
         title: "History",
         subtitle: "รายการล่าสุด",
       },
@@ -70,8 +71,8 @@ export default function HomePage() {
       },
       {
         tag: "EXCLUSIVE",
-        title: "Royalty Lounge Privilege",
-        desc: "สิทธิ์พิเศษเฉพาะสมาชิก ROYALTY",
+        title: "Loyalty Lounge Privilege",
+        desc: "สิทธิ์พิเศษเฉพาะสมาชิก Loyalty",
         meta: "จำนวนจำกัด/เดือน",
       },
       {
@@ -141,72 +142,12 @@ export default function HomePage() {
       {/* Page */}
       <section className="w-full max-w-[520px] relative pb-28">
         {/* Top User Banner */}
-        <div className="rounded-3xl border border-white/15 bg-white/10 p-4 shadow-[0_14px_30px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="relative h-14 w-14 overflow-hidden rounded-2xl bg-white ring-1 ring-white/15">
-              <Image
-                src={user.avatarUrl}
-                alt="avatar"
-                fill
-                className="object-cover"
-                sizes="56px"
-                priority
-              />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="truncate text-base font-semibold tracking-tight text-white/95">
-                  {user.name}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[11px] font-semibold text-sky-100 ring-1 ring-white/15">
-                  <Crown className="h-3.5 w-3.5 text-sky-200" />
-                  {user.tier}
-                </span>
-              </div>
-              <div className="mt-0.5 text-xs text-white/70">
-                Member No:{" "}
-                <span className="text-white/90">{user.memberNo}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button className="rounded-2xl border border-white/15 bg-white/10 p-2.5 text-white/95 hover:bg-white/15 active:scale-[0.98]">
-                <QrCode className="h-5 w-5" />
-              </button>
-              <button className="relative rounded-2xl border border-white/15 bg-white/10 p-2.5 text-white/95 hover:bg-white/15 active:scale-[0.98]">
-                <Bell className="h-5 w-5" />
-                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-sky-300 shadow-[0_0_0_3px_rgba(88,197,255,0.15)]" />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-white/15 bg-gradient-to-br from-sky-300/20 via-blue-500/15 to-rose-400/10 p-4">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <div className="text-xs font-medium text-white/75">
-                  Your Points
-                </div>
-                <div className="mt-1 text-3xl font-extrabold tracking-tight text-white/95">
-                  {formatNumber(user.points)}
-                </div>
-                <div className="mt-1 text-xs text-white/70">
-                  ใช้แลกของรางวัล / ส่วนลด / สิทธิ์พิเศษ
-                </div>
-              </div>
-
-              <button
-                className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold text-white
-                bg-gradient-to-br from-sky-300 to-blue-600
-                shadow-[0_18px_38px_rgba(45,110,255,0.28),0_8px_18px_rgba(88,197,255,0.14)]
-                hover:-translate-y-px active:scale-[0.98] transition"
-              >
-                Redeem
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <UserBanner
+          meEndpoint="/api/auth/me" // หรือ "/api/auth/me"
+          onRedeem={() => console.log("redeem")}
+          onOpenQR={() => console.log("open qr")}
+          onOpenNotifications={() => console.log("open notifications")}
+        />
 
         {/* Search */}
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-3 py-2.5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.25)]">
@@ -225,11 +166,11 @@ export default function HomePage() {
           {quickActions.map((a) => (
             <button
               key={a.title}
-              className="group rounded-2xl border border-white/15 bg-white/10 p-3 text-left backdrop-blur-xl
+              className="group rounded-2xl grid place-items-center border border-white/15 bg-white/10 p-3 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
               hover:bg-white/15 active:scale-[0.99] transition"
             >
-              <div className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15 group-hover:bg-white/15">
+              <div className="inline-flex h-9 w-9 items-center text-white/10 justify-center rounded-2xl bg-white ring-1 ring-white/15 group-hover:bg-white/15">
                 {a.icon}
               </div>
               <div className="mt-2 text-[12px] font-bold text-white/90">

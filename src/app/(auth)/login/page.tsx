@@ -111,7 +111,7 @@ export default function LoginPage() {
           <h1 className="text-[30px] leading-[1.1] font-extrabold tracking-[-0.6px]">
             เข้าสู่ระบบ <br />
             <span className="bg-gradient-to-r from-sky-300 via-blue-500 to-rose-400 bg-clip-text text-transparent">
-              Tisco Royalty
+              Tisco Loyalty
             </span>
           </h1>
 

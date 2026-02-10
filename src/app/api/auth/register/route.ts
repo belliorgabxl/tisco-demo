@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 import { User } from "@/models/User";
+import { Credit } from "@/models/Credit";
 import { connectDB } from "@/libs/database";
 
-export const runtime = "nodejs"; // ให้ชัวร์ว่าใช้ node runtime
+export const runtime = "nodejs";
 
 const RegisterSchema = z.object({
   username: z.string().min(3).max(30),
@@ -21,6 +23,20 @@ const RegisterSchema = z.object({
   policyVersion: z.string().optional().default("v1"),
 });
 
+async function canUseTransactions() {
+
+  try {
+    const db = mongoose.connection.db;
+    if (!db) return false;
+
+    const admin = db.admin();
+    const info: any = await admin.command({ hello: 1 });
+    return Boolean(info?.setName);
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => null);
@@ -28,7 +44,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         { message: "Invalid input", errors: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -37,60 +53,128 @@ export async function POST(req: Request) {
     if (!data.consentAccepted) {
       return NextResponse.json(
         { message: "Please accept Privacy Policy / Terms." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // บังคับอย่างใดอย่างหนึ่ง
     if (!data.nationalId.trim() && !data.passportNumber.trim()) {
       return NextResponse.json(
         { message: "Please provide nationalId or passportNumber." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const dob = new Date(data.dateOfBirth);
     if (Number.isNaN(dob.getTime())) {
-      return NextResponse.json({ message: "Invalid dateOfBirth" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid dateOfBirth" },
+        { status: 400 },
+      );
     }
 
     await connectDB();
 
     const exists = await User.findOne({ username: data.username }).lean();
     if (exists) {
-      return NextResponse.json({ message: "Username already taken" }, { status: 409 });
+      return NextResponse.json(
+        { message: "Username already taken" },
+        { status: 409 },
+      );
     }
 
     const passwordHash = await bcrypt.hash(data.password, 10);
 
-    await User.create({
+    const useTx = await canUseTransactions();
+
+    // ===== Case A: รองรับ transaction =====
+    if (useTx) {
+      const session = await mongoose.startSession();
+      try {
+        let createdUserId: mongoose.Types.ObjectId | null = null;
+
+        await session.withTransaction(async () => {
+          const userDoc = await User.create(
+            [
+              {
+                username: data.username,
+                passwordHash,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                dateOfBirth: dob,
+                nationality: data.nationality ?? "",
+                religion: data.religion ?? "",
+                nationalId: data.nationalId ?? "",
+                passportNumber: data.passportNumber ?? "",
+                consent: {
+                  accepted: true,
+                  acceptedAt: new Date(),
+                  policyVersion: data.policyVersion ?? "v1",
+                },
+                avatarUrl: "/data/person-user.png",
+              },
+            ],
+            { session },
+          );
+
+          createdUserId = userDoc[0]._id;
+
+          await Credit.create([{ userId: createdUserId, points: 500 }], {
+            session,
+          });
+        });
+
+        return NextResponse.json(
+          { ok: true, userId: String(createdUserId) },
+          { status: 201 },
+        );
+      } finally {
+        session.endSession();
+      }
+    }
+
+
+    const user = await User.create({
       username: data.username,
       passwordHash,
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
       dateOfBirth: dob,
-      nationality: data.nationality,
-      religion: data.religion,
-      nationalId: data.nationalId,
-      passportNumber: data.passportNumber,
+      nationality: data.nationality ?? "",
+      religion: data.religion ?? "",
+      nationalId: data.nationalId ?? "",
+      passportNumber: data.passportNumber ?? "",
       consent: {
         accepted: true,
         acceptedAt: new Date(),
-        policyVersion: data.policyVersion,
+        policyVersion: data.policyVersion ?? "v1",
       },
+      avatarUrl: "/data/person-user.png",
     });
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    // upsert credit กันซ้ำเผื่อยิงซ้ำ
+    await Credit.updateOne(
+      { userId: user._id },
+      { $setOnInsert: { userId: user._id, points: 500 } },
+      { upsert: true },
+    );
+
+    return NextResponse.json(
+      { ok: true, userId: String(user._id) },
+      { status: 201 },
+    );
   } catch (err: any) {
     console.error("REGISTER_ERROR:", err);
-
     return NextResponse.json(
       {
         message: "Server error",
-        detail: process.env.NODE_ENV !== "production" ? String(err?.message || err) : undefined,
+        detail:
+          process.env.NODE_ENV !== "production"
+            ? String(err?.message || err)
+            : undefined,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

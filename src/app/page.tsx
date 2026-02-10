@@ -56,7 +56,7 @@ export default function Home() {
             <div className="text-sm font-extrabold tracking-wide text-white/95">
               Tisco Demo
             </div>
-            <div className="text-xs text-white/70">Mobile-App Royalty</div>
+            <div className="text-xs text-white/70">Mobile-App Loyalty</div>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-3 text-sm leading-relaxed text-white/80">
-            A precise and reliable royalty program—built for mobile. Simple to
+            A precise and reliable Loyalty program—built for mobile. Simple to
             use, fast to navigate, and designed for a smooth member experience.
           </p>
         </div>

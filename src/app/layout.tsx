@@ -9,8 +9,8 @@ const prompt = Prompt({
 
 export const metadata: Metadata = {
   title: {
-    default: "Tisco Royalty Program",
-    template: "%s | Tisco Royalty",
+    default: "Tisco Loyalty Program",
+    template: "%s | Tisco Loyalty",
   },
   description:
     "",

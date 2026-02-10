@@ -143,7 +143,7 @@ export default function RegisterPage() {
           <div className="inline-flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-rose-400/90 shadow-[0_0_0_6px_rgba(244,63,94,0.12)]" />
             <span className="text-xs font-bold tracking-wide text-white/80">
-              ROYALTY MEMBER
+              Loyalty MEMBER
             </span>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function RegisterPage() {
           <h1 className="text-[30px] leading-[1.1] font-extrabold tracking-[-0.6px]">
             สมัครสมาชิก <br />
             <span className="bg-gradient-to-r from-sky-300 via-blue-500 to-rose-400 bg-clip-text text-transparent">
-              Tisco Royalty
+              Tisco Loyalty
             </span>
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-white/75">

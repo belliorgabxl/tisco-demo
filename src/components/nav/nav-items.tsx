@@ -16,7 +16,7 @@ export function NavItem({
       onClick={onClick}
       className={cn(
         "flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 transition active:scale-[0.98]",
-        active ? "bg-white/10" : "hover:bg-white/10",
+        active ? "bg-gray-200/10" : "hover:bg-gray-100/10",
       )}
     >
       <div
