@@ -1,0 +1,37 @@
+meta {
+  name: Logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/api/auth/logout
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+docs {
+  # Logout
+  
+  Clear authentication token and end user session.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  This endpoint clears the auth_token cookie from the server.
+  
+  Note: This endpoint may not exist yet in your API.
+  You can implement it or simply clear the cookie manually.
+  
+  Manual logout:
+  - Clear auth_token from environment variables
+  - Clear browser/Bruno cookies
+}
+
+script:post-response {
+  // Clear auth token from environment
+  bru.setEnvVar('auth_token', '');
+}

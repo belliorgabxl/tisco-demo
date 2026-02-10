@@ -1,0 +1,32 @@
+meta {
+  name: Environment Variables
+  type: http
+  seq: 1
+}
+
+vars {
+  baseUrl: http://localhost:3000
+  auth_token: 
+  couponId: 
+  userId: 
+  username: testuser
+}
+
+docs {
+  # Environment Variables
+  
+  Variables automatically set by Bruno:
+  ✅ auth_token - Auto-saved after login
+  
+  Variables you should set manually after testing:
+  📝 couponId - Copy from Create Coupon response
+  📝 userId - Copy from Get Me response
+  📝 username - Your test username
+  
+  Usage in requests:
+  - {{baseUrl}}/api/coupons
+  - Cookie: auth_token={{auth_token}}
+  - Replace :id with {{couponId}}
+  
+  💡 The Login script automatically saves auth_token!
+}

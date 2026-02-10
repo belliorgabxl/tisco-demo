@@ -1,0 +1,35 @@
+meta {
+  name: Get My Credits
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3000/api/credits
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+vars:pre-request {
+  auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThiNTdmNmNjOTUwNmRiYWIwNTliZTkiLCJ1c2VybmFtZSI6InRlc3R1c2VyMSIsImlhdCI6MTc3MDc0MjcxMCwiZXhwIjoxNzcxMzQ3NTEwfQ.TdJOTFCFrwo3T40eNYEmRORjuYY5LU1sy7Ba-I0x1gA
+}
+
+docs {
+  # Get My Credits (Points Balance)
+  
+  Get current user's point balance across all 3 BU types.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  Response includes:
+  - tiscoPoint: TISCO Bank points
+  - twealthPoint: TWealth points
+  - tinsurePoint: TInsure points
+  - totalPoints: Sum of all 3 types
+  
+  💡 Use this to check your balance before redeeming coupons
+}

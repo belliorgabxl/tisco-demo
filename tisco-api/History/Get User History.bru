@@ -1,0 +1,55 @@
+meta {
+  name: Get User History
+  type: http
+  seq: 10
+}
+
+get {
+  url: http://localhost:3000/api/history?limit=50&skip=0
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  skip: 0
+  ~type: coupon_redeem
+  ~status: success
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+docs {
+  # Get User History
+  
+  Get complete transaction history for the authenticated user.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  Query parameters:
+  - limit: Number of items (default: 50)
+  - skip: Pagination offset (default: 0)
+  - type: Filter by history type
+    * coupon_redeem
+    * coupon_use
+    * point_earn
+    * point_spend
+    * point_transfer
+    * tier_upgrade
+    * tier_downgrade
+  - status: Filter by status
+    * success
+    * failed
+    * pending
+    * cancelled
+  
+  Response includes:
+  - Transaction type and status
+  - Point changes (tiscoPoint, twealthPoint, tinsurePoint)
+  - Balance after transaction
+  - Related coupon/tier information
+  - Metadata and description
+  - Timestamp
+}

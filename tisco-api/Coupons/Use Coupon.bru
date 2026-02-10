@@ -1,0 +1,51 @@
+meta {
+  name: Use Coupon
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:3000/api/coupons/:uniqueCode/use
+  body: none
+  auth: none
+}
+
+params:path {
+  uniqueCode: TIS-123456789012
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+docs {
+  # Use Coupon (ใช้คูปอง)
+  
+  Mark a UserCoupon as used.
+  This changes UserCoupon status from REDEEMED → USED
+  
+  🔐 Requires Authentication (Cookie: auth_token or Authorization: Bearer)
+  
+  ⚠️ IMPORTANT: 
+  - URL parameter is now **uniqueCode** (format: TIS-XXXXXXXXXXXX)
+  - Get uniqueCode from:
+    1. Redeem response → data.uniqueCode
+    2. "Get My Coupons" response → uniqueCode field
+  - Example: TIS-123456789012
+  
+  Validations:
+  - UserCoupon must exist with this uniqueCode
+  - UserCoupon must belong to you
+  - UserCoupon must be in REDEEMED status
+  - UserCoupon must not be expired
+  
+  📝 History is automatically logged
+  
+  💡 What happens:
+  1. Your UserCoupon status changes to USED
+  2. usedAt timestamp is recorded
+  3. Coupon template's usedCount increases
+  
+  Example:
+  POST /api/coupons/TIS-123456789012/use
+}

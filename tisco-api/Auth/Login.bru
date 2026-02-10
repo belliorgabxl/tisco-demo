@@ -1,0 +1,54 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "testuser1",
+    "password": "password1234"
+  }
+}
+
+script:post-response {
+  // Auto-save auth token to environment
+  const cookies = res.headers['set-cookie'];
+  if (cookies) {
+    const authCookie = cookies.find(c => c.startsWith('auth_token='));
+    if (authCookie) {
+      const token = authCookie.split(';')[0].split('=')[1];
+      bru.setEnvVar('auth_token', token);
+    }
+  }
+}
+
+docs {
+  # Login
+  
+  Authenticate user and receive auth token in cookies.
+  
+  Request body:
+  - username: 3-30 characters
+  - password: min 6 characters
+  
+  Response:
+  - Returns { ok: true }
+  - Sets auth_token in cookie (HttpOnly)
+  - Token valid for 7 days
+  
+  🔑 Important:
+  After successful login, Bruno will automatically save the cookie.
+  You can see it in the response cookies tab.
+  
+  Copy the auth_token value for use in other requests!
+  
+  Example response cookie:
+  auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+}

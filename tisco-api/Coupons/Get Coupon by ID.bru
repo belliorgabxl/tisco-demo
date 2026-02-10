@@ -1,0 +1,23 @@
+meta {
+  name: Get Coupon by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/api/coupons/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 698b5da94c9f7e78cea0863f
+}
+
+docs {
+  # Get Single Coupon
+  
+  Retrieve details of a specific coupon by its ID.
+  
+  Replace :id with actual MongoDB ObjectId
+}

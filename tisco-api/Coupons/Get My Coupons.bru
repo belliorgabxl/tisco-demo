@@ -1,0 +1,74 @@
+meta {
+  name: Get My Coupons
+  type: http
+  seq: 9
+}
+
+get {
+  url: http://localhost:3000/api/coupons/my?limit=50&skip=0
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  skip: 0
+  ~status: redeemed
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+vars:pre-request {
+  auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThiNTdmNmNjOTUwNmRiYWIwNTliZTkiLCJ1c2VybmFtZSI6InRlc3R1c2VyMSIsImlhdCI6MTc3MDc0MTU0NCwiZXhwIjoxNzcxMzQ2MzQ0fQ.4L8bsxs8lSkCRuwcbSOyPkafxaHvd_ApBUKxxz4dnw0
+}
+
+docs {
+  # Get My Coupons
+  
+  Get UserCoupon instances that you have redeemed.
+  By default shows only REDEEMED (keep) status.
+  
+  🔐 Requires Authentication (Cookie: auth_token or Authorization: Bearer)
+  
+  Query parameters:
+  - limit: Number of items (default: 50)
+  - skip: Pagination offset (default: 0)
+  - status: Filter by status (optional)
+    * redeemed - แลกแล้ว ยังไม่ได้ใช้ (default if not specified)
+    * used - ใช้แล้ว
+    * expired - หมดอายุก่อนใช้
+    * cancelled - ยกเลิกแล้ว
+  
+  ⚠️ Default behavior: Shows only REDEEMED coupons unless status param is provided
+  
+  Response includes array of UserCoupons with:
+  - _id: UserCoupon ID (use this for "Use Coupon" endpoint)
+  - userId: Your user ID
+  - couponId: Coupon template with ONLY these fields:
+    * title: Coupon title
+    * description: Coupon description
+    * discountValue: Discount amount
+    * discountType: "percentage" or "fixed"
+    * minPurchase: Minimum purchase amount
+    * maxDiscount: Maximum discount amount
+    * pointCost: Points spent to redeem
+  - status: Current status
+  - uniqueCode: Your unique coupon code (TIS-XXXXXXXXXXXX)
+  - redeemedAt: When you redeemed it
+  - usedAt: When you used it (if used)
+  - expiresAt: Expiration date
+  - pointsSpent: Points you spent to redeem
+  - pointTypeUsed: Which point type you used
+  
+  💡 To use a coupon:
+  1. Find the coupon with status="redeemed"
+  2. Copy its uniqueCode (TIS-XXXXXXXXXXXX)
+  3. Call POST /api/coupons/{uniqueCode}/use
+  
+  Example: POST /api/coupons/TIS-123456789012/use
+  
+  💡 To see used coupons:
+  - Add query param: ?status=used
+}

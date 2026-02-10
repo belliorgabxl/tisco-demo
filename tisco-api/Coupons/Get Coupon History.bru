@@ -1,0 +1,42 @@
+meta {
+  name: Get Coupon History
+  type: http
+  seq: 8
+}
+
+get {
+  url: http://localhost:3000/api/coupons/:id/history?limit=50&skip=0
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 50
+  skip: 0
+}
+
+params:path {
+  id: 698b5da94c9f7e78cea0863f
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+docs {
+  # Get Coupon History
+  
+  Get usage history for a specific coupon.
+  Shows all users who redeemed or used this coupon.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  Query parameters:
+  - limit: Number of items (default: 50)
+  - skip: Pagination offset (default: 0)
+  
+  Response includes:
+  - User information (username, name, email)
+  - Timestamp of action
+  - Action type (redeem/use)
+}

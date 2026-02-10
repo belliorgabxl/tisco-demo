@@ -1,0 +1,23 @@
+meta {
+  name: Delete Coupon
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:3000/api/coupons/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 698b5be54c9f7e78cea08622
+}
+
+docs {
+  # Delete Coupon
+  
+  Permanently delete a coupon by its ID.
+  
+  ⚠️ Warning: This action cannot be undone.
+}
