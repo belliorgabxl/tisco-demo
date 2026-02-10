@@ -87,7 +87,6 @@ export async function POST(
       );
     }
 
-    // Check stock
     if (coupon.stock <= 0) {
       return NextResponse.json(
         { success: false, message: "Coupon out of stock" },
@@ -95,11 +94,8 @@ export async function POST(
       );
     }
 
-    // Get point cost first
     const pointCost = coupon.pointCost || 0;
 
-    // Check if applicable BU matches (only if coupon costs points)
-    // Free coupons (pointCost = 0) can be redeemed with any point type
     if (
       pointCost > 0 &&
       coupon.applicableBU !== "all" &&
