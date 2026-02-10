@@ -9,3 +9,7 @@ export const inputBase =
 
 
 export type NavKey = "home" | "rewards" | "wallet" | "history" | "profile";
+
+export type PointType = "TISCO" | "TINSURE" | "TWEALTH";
+
+export const ACTIVE_POINT_TYPE_KEY = "activePointType";

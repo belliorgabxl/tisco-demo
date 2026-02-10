@@ -1,7 +1,49 @@
+import { PointType } from "@/resource/constant";
+import { MeResponse } from "@/resource/type";
+
 export function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 export function formatNumber(n: number) {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function mapMeToBanner(data: any): MeResponse {
+  const src = data?.user ?? data?.data?.user ?? data?.data ?? data;
+
+  const first = String(src?.firstName ?? "").trim();
+  const last = String(src?.lastName ?? "").trim();
+  const name =
+    String(src?.name ?? "").trim() ||
+    [first].filter(Boolean).join(" ") ||
+    "Member";
+
+  const base: Record<PointType, number> = { TISCO: 0, TINSURE: 0, TWEALTH: 0 };
+
+  if (Array.isArray(src?.credits)) {
+    for (const c of src.credits) {
+      const t = String(c?.creditType ?? "").toUpperCase();
+      const amt = Number(c?.creditAmount ?? 0);
+
+      if (t === "TISCO_POINT" || t === "TISCO" || t === "POINT")
+        base.TISCO += amt;
+      if (t === "TINSURE_POINT" || t === "TINSURE") base.TINSURE += amt;
+      if (t === "TWEALTH_POINT" || t === "TWEALTH") base.TWEALTH += amt;
+    }
+  } else if (src?.points && typeof src.points === "object") {
+    base.TISCO = Number(src.points.tisco ?? src.points.TISCO ?? 0);
+    base.TINSURE = Number(src.points.tinsure ?? src.points.TINSURE ?? 0);
+    base.TWEALTH = Number(src.points.twealth ?? src.points.TWEALTH ?? 0);
+  } else {
+    base.TISCO = Number(src?.points ?? 0);
+  }
+
+  return {
+    name,
+    tier: String(src?.tier?.name ?? src?.tier ?? "Member"),
+    pointsByType: base,
+    memberNo: String(src?.memberNo ?? "-"),
+    avatarUrl: String(src?.avatarUrl ?? "/data/person-user-1.png"),
+  };
 }

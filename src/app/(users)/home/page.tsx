@@ -1,11 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
-  Crown,
   QrCode,
-  Bell,
   ChevronRight,
   Search,
   Gift,
@@ -17,19 +14,17 @@ import {
   Receipt,
 } from "lucide-react";
 import UserBanner from "@/components/common/banner";
+import { PointType } from "@/resource/constant";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  const user = useMemo(
-    () => ({
-      name: "Gabel",
-      tier: "Supreme",
-      points: 12520,
-      memberNo: "JP-1049-2391",
-      avatarUrl: "/data/person-user.png",
-    }),
-    [],
-  );
-
+  // const [pointType, setPointType] = useState<PointType>("TISCO");
+  const router = useRouter();
+  const [activePointType, setActivePointType] = useState<PointType>(() => {
+    if (typeof window === "undefined") return "TISCO";
+    const v = sessionStorage.getItem("activePointType") as PointType | null;
+    return v === "TINSURE" || v === "TWEALTH" ? v : "TISCO";
+  });
   const quickActions = useMemo(
     () => [
       {
@@ -105,16 +100,13 @@ export default function HomePage() {
     ],
     [],
   );
-
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
-      {/* Background (ธีมเดียวกับหน้าแรก) */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10
         bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
       />
-      {/* Grid overlay */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 opacity-45
@@ -122,7 +114,6 @@ export default function HomePage() {
         [background-size:28px_28px]
         [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
       />
-      {/* Glows */}
       <div
         aria-hidden
         className="absolute -top-44 -left-40 -z-10 h-[520px] w-[520px] blur-[2px]
@@ -136,16 +127,20 @@ export default function HomePage() {
 
       {/* Page */}
       <section className="w-full max-w-[520px] relative pb-28">
-        {/* Top User Banner */}
-        <UserBanner
-          meEndpoint="/api/auth/me" // หรือ "/api/auth/me"
-          onRedeem={() => console.log("redeem")}
-          onOpenQR={() => console.log("open qr")}
-          onOpenNotifications={() => console.log("open notifications")}
-        />
+        <div className="relative z-50">
+          <UserBanner
+            meEndpoint="/api/auth/me"
+            onRedeem={() => console.log("redeem")}
+            onOpenNotifications={() => console.log("open notifications")}
+            onAccountChange={(next) => {
+              setActivePointType(next); // ✅ เก็บ state ไว้ใช้กับหน้า home
+              router.refresh(); // ✅ refresh หน้า home
+            }}
+          />
+        </div>
 
         {/* Search */}
-        <div className="mt-4 flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-3 py-2.5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.25)]">
+        <div className="mt-4 z-0 flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-3 py-2.5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.25)]">
           <Search className="h-5 w-5 text-white/70" />
           <input
             className="w-full bg-transparent text-sm text-white/90 placeholder:text-white/55 outline-none"
@@ -157,7 +152,7 @@ export default function HomePage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-4 grid grid-cols-4 gap-2">
+        <div className="mt-4 z-0 grid grid-cols-4 gap-2">
           {quickActions.map((a) => (
             <button
               key={a.title}
@@ -285,8 +280,6 @@ export default function HomePage() {
         {/* remove tap highlight */}
         <style>{`button{-webkit-tap-highlight-color:transparent;} input{-webkit-tap-highlight-color:transparent;}`}</style>
       </section>
-
-      <div className="fixed inset-x-0 bottom-0 z-50"></div>
     </main>
   );
 }

@@ -82,7 +82,7 @@ export default function Home() {
             className="group h-13 rounded-2xl font-bold tracking-wide
               flex items-center justify-center text-white
               bg-gradient-to-br from-sky-300 to-blue-600
-              shadow-[0_18px_38px_rgba(45,110,255,0.35),0_8px_18px_rgba(88,197,255,0.18)]
+  
               
               active:scale-[0.99] hover:-translate-y-pxtransition"
           >

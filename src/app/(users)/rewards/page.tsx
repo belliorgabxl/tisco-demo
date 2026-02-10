@@ -1,8 +1,13 @@
 "use client";
 
 import UserBanner from "@/components/common/banner";
+import { PointType } from "@/resource/constant";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function HomePage() {
+  const router = useRouter();
+  const [activePointType, setActivePointType] = useState<PointType>("TISCO");
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
       <div
@@ -10,7 +15,6 @@ export default function HomePage() {
         className="absolute inset-0 -z-10
         bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
       />
-      {/* Grid overlay */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 opacity-45
@@ -18,7 +22,6 @@ export default function HomePage() {
         [background-size:28px_28px]
         [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
       />
-      {/* Glows */}
       <div
         aria-hidden
         className="absolute -top-44 -left-40 -z-10 h-[520px] w-[520px] blur-[2px]
@@ -30,18 +33,18 @@ export default function HomePage() {
         bg-[radial-gradient(circle_at_60%_60%,rgba(45,110,255,0.26),transparent_62%)]"
       />
       <section className="w-full max-w-[520px] relative pb-28">
-        {/* Top User Banner */}
         <UserBanner
-          meEndpoint="/api/auth/me" 
+          meEndpoint="/api/auth/me"
           onRedeem={() => console.log("redeem")}
-          onOpenQR={() => console.log("open qr")}
           onOpenNotifications={() => console.log("open notifications")}
+          onAccountChange={(next) => {
+            setActivePointType(next); 
+            router.refresh(); 
+          }}
         />
-
 
         <style>{`button{-webkit-tap-highlight-color:transparent;} input{-webkit-tap-highlight-color:transparent;}`}</style>
       </section>
-
     </main>
   );
 }

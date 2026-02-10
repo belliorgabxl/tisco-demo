@@ -1,52 +1,75 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { Bell, ChevronRight, Crown, QrCode } from "lucide-react";
-import { formatNumber } from "@/libs/utils/format";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Bell, ChevronRight, Crown } from "lucide-react";
+import { formatNumber, mapMeToBanner } from "@/libs/utils/format";
+import { ACTIVE_POINT_TYPE_KEY, PointType } from "@/resource/constant";
+import { useRouter } from "next/navigation";
+import { BannerError, BannerSkeleton } from "./loading-banner";
+import { MeResponse } from "@/resource/type";
 
-type MeResponse = {
-  name: string;
-  tier: string;
-  points: number;
-  memberNo: string;
-  avatarUrl: string;
-};
-
-function mapMeToBanner(data: any): MeResponse {
-  const src = data?.user ?? data?.data?.user ?? data?.data ?? data;
-
-  const first = String(src?.firstName ?? "").trim();
-  const last = String(src?.lastName ?? "").trim();
-  const name =
-    String(src?.name ?? "").trim() ||
-    [first, last].filter(Boolean).join(" ") ||
-    "Member";
-
-  return {
-    name,
-    tier: String(src?.tier?.name ?? src?.tier ?? "Member"),
-    points: Number(src?.points ?? 0),
-    memberNo: String(src?.memberNo ?? "-"),
-    avatarUrl: String(src?.avatarUrl ?? "/data/person-user.png"),
-  };
-}
-
+const POINT_TYPES: Array<{
+  type: PointType;
+  title: string;
+  sub: string;
+  logo: string;
+}> = [
+  {
+    type: "TISCO",
+    title: "Tisco Point",
+    sub: "แต้มสะสม",
+    logo: "/data/person-user-1.png",
+  },
+  {
+    type: "TINSURE",
+    title: "TInsure",
+    sub: "แต้มประกัน",
+    logo: "/data/person-user-2.png",
+  },
+  {
+    type: "TWEALTH",
+    title: "TWealth",
+    sub: "แต้มลงทุน",
+    logo: "/data/person-user-3.png",
+  },
+];
 
 export default function UserBanner({
-  meEndpoint = "/auth/me",
+  meEndpoint = "/api/auth/me",
   onRedeem,
-  onOpenQR,
   onOpenNotifications,
+  onAccountChange,
 }: {
   meEndpoint?: string;
   onRedeem?: () => void;
-  onOpenQR?: () => void;
   onOpenNotifications?: () => void;
+  onAccountChange?: (next: PointType) => void;
 }) {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
+
+  const [activeType, setActiveType] = useState<PointType>("TISCO");
+
+  const [openSwitch, setOpenSwitch] = useState(false);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(
+        ACTIVE_POINT_TYPE_KEY,
+      ) as PointType | null;
+      if (saved === "TISCO" || saved === "TINSURE" || saved === "TWEALTH") {
+        setActiveType(saved);
+      } else {
+        sessionStorage.setItem(ACTIVE_POINT_TYPE_KEY, "TISCO");
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -62,9 +85,7 @@ export default function UserBanner({
           headers: { Accept: "application/json" },
         });
 
-        if (!res.ok) {
-          throw new Error(`auth/me failed (${res.status})`);
-        }
+        if (!res.ok) throw new Error(`auth/me failed (${res.status})`);
 
         const json = await res.json();
         const mapped = mapMeToBanner(json);
@@ -81,7 +102,25 @@ export default function UserBanner({
     return () => {
       alive = false;
     };
-  }, [meEndpoint]);
+  }, [meEndpoint, reloadKey]);
+
+  useEffect(() => {
+    function onDocDown(e: MouseEvent) {
+      const el = wrapRef.current;
+      if (!el) return;
+      if (!el.contains(e.target as Node)) setOpenSwitch(false);
+    }
+    if (openSwitch) document.addEventListener("mousedown", onDocDown);
+    return () => document.removeEventListener("mousedown", onDocDown);
+  }, [openSwitch]);
+
+  const sortedPoints = useMemo(() => {
+    return [...POINT_TYPES].sort((a, b) => {
+      if (a.type === activeType) return -1;
+      if (b.type === activeType) return 1;
+      return 0;
+    });
+  }, [activeType]);
 
   const content = useMemo(() => {
     if (loading) return <BannerSkeleton />;
@@ -90,25 +129,141 @@ export default function UserBanner({
     const user = me ?? {
       name: "Member",
       tier: "Member",
-      points: 0,
+      pointsByType: { TISCO: 0, TINSURE: 0, TWEALTH: 0 },
       memberNo: "-",
-      avatarUrl: "/data/person-user.png",
+      avatarUrl: "/data/person-user-1.png",
     };
+
+    const activePoints = user.pointsByType[activeType] ?? 0;
+    const activeMeta =
+      POINT_TYPES.find((x) => x.type === activeType) ?? POINT_TYPES[0];
+
+    function switchType(next: PointType) {
+      if (next === activeType) {
+        setOpenSwitch(false);
+        return;
+      }
+
+      setActiveType(next);
+      setOpenSwitch(false);
+
+      try {
+        sessionStorage.setItem(ACTIVE_POINT_TYPE_KEY, next);
+      } catch {}
+
+      setReloadKey((k) => k + 1);
+
+      onAccountChange?.(next);
+    }
 
     return (
       <div className="rounded-3xl border border-white/15 bg-white/10 p-4 shadow-[0_14px_30px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
         <div className="flex items-center gap-3">
-          <div className="relative h-14 w-14 overflow-hidden rounded-2xl bg-white ring-1 ring-white/15">
-            <Image
-              src={user.avatarUrl}
-              alt="avatar"
-              fill
-              className="object-cover"
-              sizes="56px"
-              priority
-            />
+          <div ref={wrapRef} className="relative z-[100] shrink-0">
+            <button
+              type="button"
+              onClick={() => setOpenSwitch((v) => !v)}
+              className="relative h-14 w-14 overflow-hidden rounded-2xl bg-white ring-1 ring-white/15
+                 hover:opacity-95 transition"
+              aria-label="Switch account"
+            >
+              <Image
+                src={activeMeta.logo}
+                alt="avatar"
+                fill
+                className="object-cover"
+                sizes="56px"
+                priority
+              />
+            </button>
+
+            {/* Dropdown (anchor ใต้ avatar) */}
+            <div
+              className={`absolute left-0 top-[calc(100%+10px)] w-[260px] z-[200]
+                rounded-3xl border border-white/15 bg-[#07162F]/95 p-3 backdrop-blur-2xl
+                shadow-[0_18px_45px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)]
+                origin-top-left transition-all duration-200 ease-out
+                ${
+                  openSwitch
+                    ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+                    : "opacity-0 -translate-y-2 scale-[0.98] pointer-events-none"
+                }
+              `}
+            >
+              <div className="px-1 text-xs font-semibold text-white/80">
+                Switch Your Accounts
+              </div>
+
+              <div className="mt-2 space-y-2">
+                {sortedPoints.map((p) => {
+                  const isActive = p.type === activeType;
+
+                  return (
+                    <button
+                      key={p.type}
+                      type="button"
+                      onClick={() => switchType(p.type)}
+                      className={`w-full rounded-2xl border px-2.5 py-2 text-left transition
+                              ${
+                                isActive
+                                  ? "border-white/25 bg-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
+                                  : "border-white/10 bg-white/10 hover:bg-white/15"
+                              }
+                            `}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`relative h-10 w-10 overflow-hidden rounded-2xl ring-1
+                                  ${
+                                    isActive
+                                      ? "bg-white ring-white/20"
+                                      : "bg-white/10 ring-white/10"
+                                  }
+                                `}
+                        >
+                          <Image
+                            src={p.logo}
+                            alt={p.title}
+                            fill
+                            sizes="40px"
+                            className="object-cover h-10 w-10"
+                          />
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div
+                              className={`truncate text-[12px] font-bold ${
+                                isActive ? "text-white" : "text-white/90"
+                              }`}
+                            >
+                              {p.title}
+                            </div>
+
+                            {isActive && (
+                              <span className="shrink-0 rounded-full bg-green-300/50 px-2 py-0.5 text-[10px] font-bold text-sky-100 ring-1 ring-green-500/30">
+                                Active Account
+                              </span>
+                            )}
+                          </div>
+
+                          <div
+                            className={`truncate text-[10px] ${
+                              isActive ? "text-white/70" : "text-white/60"
+                            }`}
+                          >
+                            {p.sub}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
+          {/* user info */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="truncate text-base font-semibold tracking-tight text-white/95">
@@ -124,36 +279,45 @@ export default function UserBanner({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onOpenQR}
-              className="rounded-2xl border border-white/15 bg-white/10 p-2.5 text-white/95 hover:bg-white/15 active:scale-[0.98]"
-              aria-label="Open QR"
-            >
-              <QrCode className="h-5 w-5" />
-            </button>
+          {/* notification */}
+          <button
+            type="button"
+            // onClick={() => setOpenSwitch((v) => !v)}
+            className="rounded-2xl border border-white/15 bg-white/80 p-1 text-white/95 hover:bg-white/15 active:scale-[0.98]"
+            aria-label="Switch point type"
+          >
+            <div className="relative h-8 w-8">
+              <Image
+                src="/logo/tisco-logo.png"
+                alt="point logo"
+                fill
+                className="object-contain"
+                sizes="32px"
+                priority
+              />
+            </div>
+          </button>
 
-            <button
-              type="button"
-              onClick={onOpenNotifications}
-              className="relative rounded-2xl border border-white/15 bg-white/10 p-2.5 text-white/95 hover:bg-white/15 active:scale-[0.98]"
-              aria-label="Open notifications"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-sky-300 shadow-[0_0_0_3px_rgba(88,197,255,0.15)]" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onOpenNotifications}
+            className="relative rounded-2xl border border-white/15 bg-white/10 p-2.5 text-white/95 hover:bg-white/15 active:scale-[0.98]"
+            aria-label="Open notifications"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-sky-300 shadow-[0_0_0_3px_rgba(88,197,255,0.15)]" />
+          </button>
         </div>
 
         <div className="mt-4 rounded-2xl border border-white/15 bg-gradient-to-br from-sky-300/20 via-blue-500/15 to-rose-400/10 p-4">
           <div className="flex items-end justify-between gap-3">
             <div>
               <div className="text-xs font-medium text-white/75">
-                Your Points
+                Your Points ·{" "}
+                <span className="text-white/85">{activeMeta.title}</span>
               </div>
               <div className="mt-1 text-3xl font-extrabold tracking-tight text-white/95">
-                {formatNumber(user.points)}
+                {formatNumber(activePoints)}
               </div>
               <div className="mt-1 text-xs text-white/70">
                 ใช้แลกของรางวัล / ส่วนลด / สิทธิ์พิเศษ
@@ -175,46 +339,16 @@ export default function UserBanner({
         </div>
       </div>
     );
-  }, [loading, error, me, onRedeem, onOpenQR, onOpenNotifications]);
+  }, [
+    loading,
+    error,
+    me,
+    onRedeem,
+    onOpenNotifications,
+    activeType,
+    openSwitch,
+    router,
+  ]);
 
   return content;
-}
-
-function BannerSkeleton() {
-  return (
-    <div className="rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.25)]">
-      <div className="flex items-center gap-3">
-        <div className="h-14 w-14 rounded-2xl bg-white/10 animate-pulse ring-1 ring-white/10" />
-        <div className="flex-1">
-          <div className="h-4 w-40 rounded bg-white/10 animate-pulse" />
-          <div className="mt-2 h-3 w-52 rounded bg-white/10 animate-pulse" />
-        </div>
-        <div className="flex gap-2">
-          <div className="h-10 w-10 rounded-2xl bg-white/10 animate-pulse ring-1 ring-white/10" />
-          <div className="h-10 w-10 rounded-2xl bg-white/10 animate-pulse ring-1 ring-white/10" />
-        </div>
-      </div>
-
-      <div className="mt-4 rounded-2xl border border-white/15 bg-white/10 p-4">
-        <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
-        <div className="mt-2 h-8 w-40 rounded bg-white/10 animate-pulse" />
-        <div className="mt-2 h-3 w-56 rounded bg-white/10 animate-pulse" />
-        <div className="mt-4 h-10 w-28 rounded-2xl bg-white/10 animate-pulse" />
-      </div>
-    </div>
-  );
-}
-
-function BannerError({ message }: { message: string }) {
-  return (
-    <div className="rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.25)]">
-      <div className="text-sm font-bold text-white/90">
-        โหลดข้อมูลผู้ใช้ไม่สำเร็จ
-      </div>
-      <div className="mt-1 text-xs text-white/70">{message}</div>
-      <div className="mt-3 text-xs text-white/70">
-        (ถ้าเป็น 401 ให้พาไปหน้า Login หรือเช็ค cookie/token)
-      </div>
-    </div>
-  );
 }
