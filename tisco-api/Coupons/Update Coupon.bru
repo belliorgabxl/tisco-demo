@@ -1,0 +1,39 @@
+meta {
+  name: Update Coupon
+  type: http
+  seq: 4
+}
+
+patch {
+  url: http://localhost:3000/api/coupons/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 698b5be54c9f7e78cea08622
+}
+
+body:json {
+  {
+    "stock": 150,
+    "status": "active",
+    "title": "Updated Title",
+    "discountValue": 25
+  }
+}
+
+docs {
+  # Update Coupon
+  
+  Partially update an existing coupon.
+  All fields are optional - only send the fields you want to update.
+  
+  Updatable fields:
+  - coupon_type, stock, status
+  - title, description
+  - discountValue, discountType
+  - minPurchase, maxDiscount
+  - pointCost, applicableBU
+  - expired, tierId
+}

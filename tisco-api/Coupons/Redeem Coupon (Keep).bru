@@ -1,0 +1,63 @@
+meta {
+  name: Redeem Coupon (Keep)
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:3000/api/coupons/:id/redeem
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 698b651f14197983a531b408
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+body:json {
+  {
+    "pointType": "tisco"
+  }
+}
+
+vars:pre-request {
+  auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThiNTdmNmNjOTUwNmRiYWIwNTliZTkiLCJ1c2VybmFtZSI6InRlc3R1c2VyMSIsImlhdCI6MTc3MDc0Mjg3NCwiZXhwIjoxNzcxMzQ3Njc0fQ.cZVmsAQmYuk5P0aRRsqpwC1ZU8n4SvUnH3PKFEuNurs
+}
+
+docs {
+  # Redeem Coupon (แลกคูปอง)
+  
+  User redeems a coupon template using their points.
+  This creates a NEW UserCoupon instance for the user.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  Request body:
+  - pointType: "tisco", "twealth", or "tinsure"
+  
+  Validations:
+  - Coupon must be in ACTIVE status
+  - User must have enough points
+  - Coupon must not be expired
+  - Stock must be available
+  - Point type must match applicableBU
+  - User cannot redeem the same coupon twice
+  
+  Response includes:
+  - userCoupon: Your personal coupon instance
+  - uniqueCode: Unique code for this coupon (e.g., UC-1234567890-ABC123)
+  - remainingPoints: Your points after redemption
+  - couponStock: Remaining stock of the template
+  
+  📝 History is automatically logged
+  
+  💡 What happens:
+  1. Points are deducted from your account
+  2. Coupon template stock decreases
+  3. A new UserCoupon is created with status = REDEEMED
+  4. You get a unique code for your coupon
+}

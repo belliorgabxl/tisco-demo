@@ -1,0 +1,54 @@
+meta {
+  name: Create Coupon
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/coupons
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "coupon_type": "discount",
+    "title": "30% Off Next Purchase",
+    "description": "Get 20% discount on your next purchase",
+    "stock": 100,
+    "status": "active",
+    "expired": "2026-12-31T23:59:59.999Z",
+    "discountValue": 30,
+    "discountType": "percentage",
+    "minPurchase": 1000,
+    "maxDiscount": 500,
+    "pointCost": 500,
+    "applicableBU": "twealth"
+  }
+}
+
+docs {
+  # Create New Coupon Template
+  
+  Create a new coupon template (not individual instances).
+  This is a template that users can redeem to get their own UserCoupon.
+  
+  Required fields:
+  - coupon_type: Type of coupon
+  - stock: Available quantity
+  - expired: Expiration date (ISO 8601 format)
+  
+  Optional fields:
+  - status: active (default), inactive, expired, suspended
+  - tierId: Link to specific tier
+  - title, description
+  - discountValue, discountType (percentage or fixed)
+  - minPurchase, maxDiscount
+  - pointCost: Points required to redeem
+  - applicableBU: tisco, twealth, tinsure, all (default)
+  
+  💡 When users redeem this coupon:
+  - stock decreases
+  - redeemedCount increases
+  - A new UserCoupon is created for that user
+}

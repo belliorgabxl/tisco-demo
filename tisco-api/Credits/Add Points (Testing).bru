@@ -1,0 +1,55 @@
+meta {
+  name: Add Points (Testing)
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/credits
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+body:json {
+  {
+    "tiscoPoint": 1000,
+    "twealthPoint": 500,
+    "tinsurePoint": 300
+  }
+}
+
+vars:pre-request {
+  auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OThiNTdmNmNjOTUwNmRiYWIwNTliZTkiLCJ1c2VybmFtZSI6InRlc3R1c2VyMSIsImlhdCI6MTc3MDc0MjcxMCwiZXhwIjoxNzcxMzQ3NTEwfQ.TdJOTFCFrwo3T40eNYEmRORjuYY5LU1sy7Ba-I0x1gA
+}
+
+docs {
+  # Add Points (For Testing)
+  
+  Add points to your account for testing coupon redemption.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  Request body (all optional):
+  - tiscoPoint: Amount to add (default: 0)
+  - twealthPoint: Amount to add (default: 0)
+  - tinsurePoint: Amount to add (default: 0)
+  - description: Optional note
+  
+  💡 Testing workflow:
+  1. Login/Register
+  2. Add points using this endpoint
+  3. Check balance with GET /api/credits
+  4. Redeem coupons
+  
+  📝 This action is logged in history as POINT_EARN
+  
+  ⚠️ Note: In production, points should be earned through:
+  - Purchases
+  - Promotions
+  - Rewards programs
+  - NOT manually added!
+}

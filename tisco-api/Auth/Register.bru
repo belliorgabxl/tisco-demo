@@ -1,0 +1,53 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "testuser1",
+    "password": "password1234",
+    "firstName": "John A",
+    "lastName": "DoeE",
+    "email": "john.doe@example.com",
+    "dateOfBirth": "1990-01-15",
+    "nationality": "Thai",
+    "religion": "Buddhist",
+    "nationalId": "1234567890123",
+    "passportNumber": "",
+    "consentAccepted": true,
+    "policyVersion": "v1"
+  }
+}
+
+docs {
+  # Register New User
+  
+  Create a new user account with full profile information.
+  
+  Required fields:
+  - username: 3-30 characters, unique
+  - password: min 6 characters
+  - firstName, lastName
+  - email: valid email format
+  - dateOfBirth: ISO date string
+  - consentAccepted: must be true
+  
+  Optional fields:
+  - nationality, religion
+  - nationalId, passportNumber
+  - policyVersion (default: "v1")
+  
+  Response:
+  - User object with ID
+  - Initial credit account (0 points for all 3 BU types)
+  
+  💡 Save the username/password for login!
+}

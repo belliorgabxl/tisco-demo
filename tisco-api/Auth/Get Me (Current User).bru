@@ -1,0 +1,49 @@
+meta {
+  name: Get Me (Current User)
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/api/auth/me
+  body: none
+  auth: none
+}
+
+headers {
+  Cookie: auth_token={{auth_token}}
+}
+
+docs {
+  # Get Current User Profile
+  
+  Get authenticated user's profile and credit information.
+  
+  🔐 Requires Authentication (Cookie: auth_token)
+  
+  Response includes:
+  - authenticated: true/false
+  - user:
+    * userId, username
+    * firstName, lastName, email
+    * dateOfBirth, nationality, religion
+    * nationalId, passportNumber
+  - credit:
+    * tiscoPoint
+    * twealthPoint
+    * tinsurePoint
+    * totalPoints
+  - tier:
+    * key (BASIC, SUPREME, etc.)
+    * name
+    * minPoints (threshold)
+  
+  💡 Use this endpoint to:
+  - Verify login status
+  - Get user ID for other operations
+  - Check current point balance
+  - See user's tier level
+  
+  If not authenticated, returns:
+  { authenticated: false }
+}
