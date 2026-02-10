@@ -36,7 +36,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const activeNav = pathToNavKey(pathname);
 
-  const hideNavbar = ["/", "/login", "/register"].includes(pathname);
+  const hideNavbar = ["/", "/login", "/register" ,"/dashboard"].includes(pathname);
 
   return (
     <div className="min-h-dvh">

@@ -42,7 +42,16 @@ export async function POST(req: Request) {
     username: user.username,
   });
 
-  const res = NextResponse.json({ ok: true });
+  const res = NextResponse.json({
+    success: true,
+    message: "Login successful",
+    token,
+    user: {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+    },
+  });
   res.cookies.set("auth_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
