@@ -8,6 +8,8 @@ function pathToNavKey(path: string): NavKey {
   if (path.startsWith("/rewards")) return "rewards";
   if (path.startsWith("/wallet")) return "wallet";
   if (path.startsWith("/history")) return "history";
+  if (path.startsWith("/profile")) return "profile";
+  if (path.startsWith("/home")) return "home";
   return "home";
 }
 
@@ -15,12 +17,16 @@ function navKeyToPath(key: NavKey): string {
   switch (key) {
     case "rewards":
       return "/rewards";
+    case "home":
+      return "/home";
     case "wallet":
       return "/wallet";
     case "history":
       return "/history";
+    case "profile":
+      return "/profile";
     default:
-      return "/home";
+      return "/profile";
   }
 }
 

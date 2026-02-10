@@ -328,7 +328,7 @@ export default function UserBanner({
               type="button"
               onClick={onRedeem}
               className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold 
-                bg-white text-gray-900
+                bg-white text-blue-950
                 shadow-[0_18px_38px_rgba(45,110,255,0.28),0_8px_18px_rgba(88,197,255,0.14)]
                 hover:-translate-y-px active:scale-[0.98] transition"
             >
