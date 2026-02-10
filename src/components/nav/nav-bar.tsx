@@ -3,8 +3,7 @@
 import React from "react";
 import { Home as HomeIcon, Gift, Wallet, Receipt, UserRound } from "lucide-react";
 import { NavItem } from "./nav-items";
-
-export type NavKey = "home" | "rewards" | "wallet" | "history" | "profile";
+import { NavKey } from "@/resource/constant";
 
 export default function Navbar({
   activeNav,

@@ -16,9 +16,6 @@ import {
   Flame,
   Receipt,
 } from "lucide-react";
-import { formatNumber } from "@/libs/utils/format";
-import { NavKey } from "@/resource/constant";
-import Navbar from "@/components/nav/nav-bar";
 import UserBanner from "@/components/common/banner";
 
 export default function HomePage() {
@@ -33,7 +30,6 @@ export default function HomePage() {
     [],
   );
 
-  const [activeNav, setActiveNav] = useState<NavKey>("home");
 
   const quickActions = useMemo(
     () => [
@@ -123,7 +119,7 @@ export default function HomePage() {
       <div
         aria-hidden
         className="absolute inset-0 -z-10 opacity-45
-        [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)]
+        [background-image:linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)]
         [background-size:28px_28px]
         [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
       />
@@ -293,7 +289,7 @@ export default function HomePage() {
 
       {/* Bottom Mobile Navbar */}
       <div className="fixed inset-x-0 bottom-0 z-50">
-        <Navbar activeNav={activeNav} onChange={setActiveNav} />
+        {/* <Navbar activeNav={activeNav} onChange={setActiveNav} /> */}
       </div>
     </main>
   );
