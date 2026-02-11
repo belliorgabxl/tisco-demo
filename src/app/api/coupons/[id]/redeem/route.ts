@@ -79,7 +79,6 @@ export async function POST(
       );
     }
 
-    // Check expired
     if (new Date(coupon.expired) < new Date()) {
       return NextResponse.json(
         { success: false, message: "Coupon has expired" },
@@ -110,7 +109,6 @@ export async function POST(
       );
     }
 
-    // Check if user already redeemed this coupon
     const existingUserCoupon = await UserCoupon.findOne({
       userId,
       couponId: coupon._id,
@@ -135,7 +133,6 @@ export async function POST(
       });
     }
 
-    // Check if user has enough points
     const pointField = `${pointType}Point` as
       | "tiscoPoint"
       | "twealthPoint"

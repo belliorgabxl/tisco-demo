@@ -8,7 +8,7 @@ import { verifyToken } from "@/libs/auth";
 
 import { Credit } from "@/models/Credit";
 import { Coupon, CouponStatus } from "@/models/Coupon";
-import { UserCoupon } from "@/models/UserCoupon";
+import { UserCoupon, UserCouponStatus } from "@/models/UserCoupon";
 import { History, HistoryStatus, HistoryType } from "@/models/History";
 
 import { REWARDS } from "@/resource/reward";
@@ -42,21 +42,31 @@ function buFromPointType(pointType: PointType) {
 export async function POST(req: Request) {
   const token = getAuthToken(req);
   if (!token) {
-    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 },
+    );
   }
 
   let decoded: any;
   try {
     decoded = verifyToken(token);
   } catch {
-    return NextResponse.json({ success: false, message: "Invalid token" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, message: "Invalid token" },
+      { status: 401 },
+    );
   }
 
   const body = await req.json().catch(() => ({}));
   const parsed = RedeemSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { success: false, message: "Invalid input", errors: parsed.error.flatten() },
+      {
+        success: false,
+        message: "Invalid input",
+        errors: parsed.error.flatten(),
+      },
       { status: 400 },
     );
   }
@@ -65,9 +75,11 @@ export async function POST(req: Request) {
   const reward = REWARDS[rewardId];
 
   if (!reward) {
-    return NextResponse.json({ success: false, message: "Reward not found" }, { status: 404 });
+    return NextResponse.json(
+      { success: false, message: "Reward not found" },
+      { status: 404 },
+    );
   }
-
 
   if (reward.rewardType !== "coupon" || reward.pointAction.mode !== "spend") {
     return NextResponse.json(
@@ -150,19 +162,29 @@ export async function POST(req: Request) {
   }
 
   if (coupon.status !== CouponStatus.ACTIVE) {
-    return NextResponse.json({ success: false, message: "Coupon inactive" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "Coupon inactive" },
+      { status: 400 },
+    );
   }
   if (coupon.stock <= 0) {
-    return NextResponse.json({ success: false, message: "Coupon out of stock" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "Coupon out of stock" },
+      { status: 400 },
+    );
   }
   if (coupon.expired <= now) {
-    return NextResponse.json({ success: false, message: "Coupon expired" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, message: "Coupon expired" },
+      { status: 400 },
+    );
   }
-
 
   (credit as any)[field] = current - cost;
   credit.totalPoints =
-    Number(credit.tiscoPoint ?? 0) + Number(credit.twealthPoint ?? 0) + Number(credit.tinsurePoint ?? 0);
+    Number(credit.tiscoPoint ?? 0) +
+    Number(credit.twealthPoint ?? 0) +
+    Number(credit.tinsurePoint ?? 0);
   await credit.save();
 
   // --- update coupon stock ---
@@ -173,25 +195,35 @@ export async function POST(req: Request) {
   // --- create user coupon instance ---
   const code = crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase();
   const qrToken = crypto.randomUUID();
-
   const userCoupon = await UserCoupon.create({
     userId,
+
     couponId: coupon._id,
-    rewardId,
-    title: coupon.title ?? reward.title,
-    description: coupon.description ?? reward.desc,
-    image: (coupon as any).image ?? reward.image,
-    code,
-    qrToken,
+    rewardId: reward.id,
+    rewardTitle: reward.title,
+    rewardDesc: reward.desc,
+    rewardImage: reward.image,
+
+    pointType: pt,
+    pointCost: cost,
+
+    status:
+      parsed.data.mode === "now"
+        ? UserCouponStatus.ACTIVE
+        : UserCouponStatus.REDEEMED,
+
+    couponCode: code,
+    qrText: `tisco-demo://coupon/${qrToken}`,
+
     expiresAt: coupon.expired,
+    redeemedAt: new Date(),
+
     metadata: {
       rewardBadge: reward.badge,
-      pointType: pt,
-      pointCost: cost,
+      couponId: String(coupon._id),
     },
   });
 
-  // --- history success ---
   await History.create({
     userId,
     type: HistoryType.COUPON_REDEEM,
