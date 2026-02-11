@@ -37,7 +37,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/home");
+      router.push("/main/home");
     } catch {
       setMsg("Network error. Please try again.");
     } finally {

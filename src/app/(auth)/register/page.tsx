@@ -195,7 +195,7 @@ export default function RegisterPage() {
                 <Field label="Username" required hint="อย่างน้อย 3 ตัวอักษร">
                   <input
                     className={inputBase}
-                    placeholder="เช่น gabel_01"
+                    placeholder="เช่น somchai123"
                     value={form.username}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, username: e.target.value }))

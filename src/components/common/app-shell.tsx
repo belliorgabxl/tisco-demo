@@ -5,28 +5,28 @@ import Navbar from "@/components/nav/nav-bar";
 import type { NavKey } from "@/resource/constant";
 
 function pathToNavKey(path: string): NavKey {
-  if (path.startsWith("/rewards")) return "rewards";
-  if (path.startsWith("/wallet")) return "wallet";
-  if (path.startsWith("/history")) return "history";
-  if (path.startsWith("/profile")) return "profile";
-  if (path.startsWith("/home")) return "home";
+  if (path.startsWith("/main/rewards")) return "rewards";
+  if (path.startsWith("/main/wallet")) return "wallet";
+  if (path.startsWith("/main/history")) return "history";
+  if (path.startsWith("/main/profile")) return "profile";
+  if (path.startsWith("/main/home")) return "home";
   return "home";
 }
 
 function navKeyToPath(key: NavKey): string {
   switch (key) {
     case "rewards":
-      return "/rewards";
+      return "/main/rewards";
     case "home":
-      return "/home";
+      return "/main/home";
     case "wallet":
-      return "/wallet";
+      return "/main/wallet";
     case "history":
-      return "/history";
+      return "/main/history";
     case "profile":
-      return "/profile";
+      return "/main/profile";
     default:
-      return "/profile";
+      return "/main/home";
   }
 }
 
@@ -34,15 +34,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const activeNav = pathToNavKey(pathname);
+  const showNavbar =
+    pathname === "/main" || pathname.startsWith("/main/"); 
 
-  const hideNavbar = ["/", "/login", "/register" ,"/dashboard"].includes(pathname);
+  const activeNav = pathToNavKey(pathname);
 
   return (
     <div className="min-h-dvh">
-      <div className={hideNavbar ? "" : ""}>{children}</div>
+      <div className={showNavbar ? "" : ""}>{children}</div>
 
-      {!hideNavbar && (
+      {showNavbar && (
         <div className="fixed inset-x-0 bottom-0 z-50">
           <Navbar
             activeNav={activeNav}

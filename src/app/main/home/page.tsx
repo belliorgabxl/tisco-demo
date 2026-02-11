@@ -133,8 +133,8 @@ export default function HomePage() {
             onRedeem={() => console.log("redeem")}
             onOpenNotifications={() => console.log("open notifications")}
             onAccountChange={(next) => {
-              setActivePointType(next); // ✅ เก็บ state ไว้ใช้กับหน้า home
-              router.refresh(); // ✅ refresh หน้า home
+              setActivePointType(next);
+              router.refresh(); 
             }}
           />
         </div>

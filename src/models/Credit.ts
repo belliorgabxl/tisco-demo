@@ -8,11 +8,9 @@ const CreditSchema = new Schema(
       unique: true,
       index: true,
     },
-
     tiscoPoint: { type: Number, required: true, default: 0 },
     twealthPoint: { type: Number, required: true, default: 0 },
     tinsurePoint: { type: Number, required: true, default: 0 },
-
     totalPoints: { type: Number, required: true, default: 0 },
   },
   { timestamps: true },

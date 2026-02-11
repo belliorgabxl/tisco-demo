@@ -11,6 +11,7 @@ async function resolveTierByPoints(points: number) {
   const tier = await Tier.findOne({ minPoints: { $lte: points } })
     .sort({ minPoints: -1 })
     .lean();
+
   return tier
     ? { key: tier.key, name: tier.name, minPoints: tier.minPoints }
     : null;
@@ -37,7 +38,12 @@ export async function GET() {
     }
 
     const credit = await Credit.findOne({ userId }).lean();
-    const points = Number(credit?.points ?? 0);
+
+    const tiscoPoint = Number(credit?.tiscoPoint ?? 0);
+    const twealthPoint = Number(credit?.twealthPoint ?? 0);
+    const tinsurePoint = Number(credit?.tinsurePoint ?? 0);
+
+    const points = tiscoPoint + twealthPoint + tinsurePoint;
 
     const tier = await resolveTierByPoints(points);
 
@@ -49,9 +55,16 @@ export async function GET() {
           username: user.username,
           firstName: user.firstName,
           lastName: user.lastName,
-          // avatarUrl: user.avatarUrl ?? "/data/person-user.png",
           memberNo: user.memberNo ?? `JP-${String(user._id).slice(-8)}`,
+          
           points,
+
+          pointByType: {
+            tiscoPoint,
+            twealthPoint,
+            tinsurePoint,
+          },
+
           tier: tier?.name ?? "Basic",
         },
       },

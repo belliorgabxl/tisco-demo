@@ -2,9 +2,18 @@ import { PointType } from "./constant";
 
 export type MeResponse = {
   name: string;
-  pointsByType: Record<PointType, number>;
   tier: string;
   memberNo: string;
   avatarUrl: string;
+  pointsByType: Record<"TISCO" | "TINSURE" | "TWEALTH", number>;
 };
 
+export type ActivePointCardProps = {
+  meEndpoint?: string;
+  storageKey?: string;
+  onChangeType?: (next: PointType) => void;
+};
+
+export type Balances = Record<PointType, number>;
+
+export const DEFAULT_BALANCES: Balances = { TISCO: 0, TINSURE: 0, TWEALTH: 0 };

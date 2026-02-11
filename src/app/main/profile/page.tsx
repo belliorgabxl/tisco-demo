@@ -109,10 +109,14 @@ export default function MePage() {
     [router],
   );
 
-  function logout() {
-    // ปรับตามระบบ auth ของคุณ
-    // เช่น call /api/auth/logout แล้ว router.replace("/login")
+  async function logout() {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
     router.replace("/login");
+    router.refresh();
   }
 
   return (
@@ -136,28 +140,16 @@ export default function MePage() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-lg font-extrabold tracking-tight text-white/95">
-              Me
+              Profile
             </div>
             <div className="text-xs text-white/65">
               จัดการโปรไฟล์ แต้ม สิทธิ์ และการตั้งค่า
             </div>
           </div>
-
-          {/* optional logo */}
-          <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/15">
-            <Image
-              src="/logo/tisco-logo.png"
-              alt="Tisco"
-              fill
-              sizes="40px"
-              className="object-contain p-2"
-              priority
-            />
-          </div>
         </div>
 
         {/* Banner (reuse เดิม) */}
-        <div className="mt-4 z-50">
+        <div className="mt-4 relative z-50">
           <UserBanner
             meEndpoint="/api/auth/me"
             onRedeem={() => router.push("/rewards")}

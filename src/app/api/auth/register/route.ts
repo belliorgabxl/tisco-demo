@@ -24,7 +24,6 @@ const RegisterSchema = z.object({
 });
 
 async function canUseTransactions() {
-
   try {
     const db = mongoose.connection.db;
     if (!db) return false;
@@ -36,6 +35,12 @@ async function canUseTransactions() {
     return false;
   }
 }
+
+const DEFAULT_POINTS = {
+  tiscoPoint: 500,
+  twealthPoint: 1250,
+  tinsurePoint: 4000,
+};
 
 export async function POST(req: Request) {
   try {
@@ -86,7 +91,6 @@ export async function POST(req: Request) {
 
     const useTx = await canUseTransactions();
 
-    // ===== Case A: รองรับ transaction =====
     if (useTx) {
       const session = await mongoose.startSession();
       try {
@@ -119,9 +123,15 @@ export async function POST(req: Request) {
 
           createdUserId = userDoc[0]._id;
 
-          await Credit.create([{ userId: createdUserId, points: 500 }], {
-            session,
-          });
+          await Credit.create(
+            [
+              {
+                userId: createdUserId,
+                ...DEFAULT_POINTS,
+              },
+            ],
+            { session },
+          );
         });
 
         return NextResponse.json(
@@ -132,7 +142,6 @@ export async function POST(req: Request) {
         session.endSession();
       }
     }
-
 
     const user = await User.create({
       username: data.username,
@@ -153,10 +162,14 @@ export async function POST(req: Request) {
       avatarUrl: "/data/person-user.png",
     });
 
-    // upsert credit กันซ้ำเผื่อยิงซ้ำ
     await Credit.updateOne(
       { userId: user._id },
-      { $setOnInsert: { userId: user._id, points: 500 } },
+      {
+        $setOnInsert: {
+          userId: user._id,
+          ...DEFAULT_POINTS,
+        },
+      },
       { upsert: true },
     );
 

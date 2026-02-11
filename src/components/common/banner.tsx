@@ -17,7 +17,7 @@ const POINT_TYPES: Array<{
 }> = [
   {
     type: "TISCO",
-    title: "Tisco Point",
+    title: "Tisco",
     sub: "แต้มสะสม",
     logo: "/data/person-user-1.png",
   },
@@ -158,7 +158,7 @@ export default function UserBanner({
 
     return (
       <div className="rounded-3xl border border-white/15 bg-white/10 p-4 shadow-[0_14px_30px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           <div ref={wrapRef} className="relative z-[100] shrink-0">
             <button
               type="button"
@@ -309,12 +309,12 @@ export default function UserBanner({
           </button>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-white/15 bg-gradient-to-br from-sky-300/20 via-blue-500/15 to-rose-400/10 p-4">
+        <div className="mt-2 rounded-2xl border border-white/15 bg-gradient-to-br from-sky-300/20 via-blue-500/15 to-rose-400/10 p-4">
           <div className="flex items-end justify-between gap-3">
             <div>
               <div className="text-xs font-medium text-white/75">
-                Your Points ·{" "}
-                <span className="text-white/85">{activeMeta.title}</span>
+                Your  {" "}
+                <span className="text-white/85 text-lg">{activeMeta.title} Point</span>
               </div>
               <div className="mt-1 text-3xl font-extrabold tracking-tight text-white/95">
                 {formatNumber(activePoints)}
