@@ -128,7 +128,7 @@ export default function PromotionPage() {
               <Link
                 key={p.id}
                 href={`/main/promotion/${p.id}`}
-                className="relative min-w-[86%] snap-start overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
+                className="relative min-w-[86%] snap-start overflow-hidden rounded-xl border border-white/15 bg-white/10 backdrop-blur-xl
                 shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]
                 hover:bg-white/15 active:scale-[0.995] transition"
               >
@@ -205,11 +205,11 @@ export default function PromotionPage() {
                 key={k}
                 type="button"
                 onClick={() => setTab(k)}
-                className={`rounded-2xl border px-3 py-2 text-[12px] font-extrabold transition
+                className={`rounded-2xl  px-3 py-2 text-[12px] font-extrabold transition
                   ${
                     active
-                      ? "border-white/25 bg-white/20 text-white"
-                      : "border-white/10 bg-white/10 text-white/75 hover:bg-white/15"
+                      ? " bg-white text-blue-950"
+                      : " bg-white text-blue-950 hover:bg-white/15"
                   }`}
               >
                 {label}
@@ -233,8 +233,8 @@ export default function PromotionPage() {
             return (
               <Link
                 key={p.id}
-                href={`/main/promotion/${p.id}`}
-                className="block overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
+                href={`/main/promotions/${p.id}`}
+                className="block overflow-hidden rounded-xl border border-white/15 bg-white/10 backdrop-blur-xl
                 shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
                 hover:bg-white/15 active:scale-[0.995] transition"
               >
@@ -283,7 +283,7 @@ export default function PromotionPage() {
           })}
 
           {filtered.length === 0 ? (
-            <div className="rounded-3xl border border-white/15 bg-white/10 p-6 text-center text-sm text-white/70 backdrop-blur-xl">
+            <div className="rounded-xl border border-white/15 bg-white/10 p-6 text-center text-sm text-white/70 backdrop-blur-xl">
               ไม่พบโปรโมชันที่ตรงกับเงื่อนไข
             </div>
           ) : null}

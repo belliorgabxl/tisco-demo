@@ -283,10 +283,10 @@ export default function UserBanner({
           <button
             type="button"
             // onClick={() => setOpenSwitch((v) => !v)}
-            className="rounded-2xl border border-white/15 bg-white/80 p-1 text-white/95 hover:bg-white/15 active:scale-[0.98]"
+            className="rounded-2xl border border-white/15 bg-white p-1 text-white/95 hover:bg-white/15 active:scale-[0.98]"
             aria-label="Switch point type"
           >
-            <div className="relative h-8 w-8">
+            <div className="relative h-10 w-10">
               <Image
                 src="/logo/tisco-logo.png"
                 alt="point logo"
@@ -304,7 +304,7 @@ export default function UserBanner({
             className="relative rounded-2xl border border-white/15 bg-white/10 p-2.5 text-white/95 hover:bg-white/15 active:scale-[0.98]"
             aria-label="Open notifications"
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="h-7 w-7" />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-sky-300 shadow-[0_0_0_3px_rgba(88,197,255,0.15)]" />
           </button>
         </div>
@@ -312,9 +312,10 @@ export default function UserBanner({
         <div className="mt-2 rounded-2xl border border-white/15 bg-gradient-to-br from-sky-300/20 via-blue-500/15 to-rose-400/10 p-4">
           <div className="flex items-end justify-between gap-3">
             <div>
-              <div className="text-xs font-medium text-white/75">
-                Your  {" "}
-                <span className="text-white/85 text-lg">{activeMeta.title} Point</span>
+              <div className="text-xs font-medium text-white ">
+                <span className="text-white text-lg px-3 py-0.5 bg-blue-500/70 rounded-3xl">
+                  {activeMeta.title} Point
+                </span>
               </div>
               <div className="mt-1 text-3xl font-extrabold tracking-tight text-white/95">
                 {formatNumber(activePoints)}

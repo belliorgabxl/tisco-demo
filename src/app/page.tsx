@@ -37,12 +37,6 @@ export default function Home() {
             className="relative flex justify-center items-center h-14 w-14 overflow-hidden rounded-2xl bg-white
           "
           >
-            {/* border border-white/15 bg-white/10 shadow-[0_14px_30px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.10)]"> */}
-            {/* <div className="absolute inset-0 bg-[radial-gradient(20px_20px_at_30%_30%,rgba(88,197,255,0.70),transparent_60%),linear-gradient(135deg,rgba(45,110,255,0.65),rgba(88,197,255,0.18))]" />
-            <div
-              className="absolute -bottom-1.5 -right-1.5 h-6 w-6 rounded-full border border-white/20 shadow-[0_10px_24px_rgba(214,40,40,0.35)]
-              bg-[radial-gradient(circle_at_30%_30%,#FF6B6B,#D62828)]"
-            /> */}
             <Image
               src="/logo/tisco-logo.png"
               width={100}

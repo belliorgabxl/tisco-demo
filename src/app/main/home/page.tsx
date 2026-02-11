@@ -31,7 +31,7 @@ export default function HomePage() {
         icon: <Newspaper className="h-5 w-5 text-blue-900" />,
         title: "News",
         subtitle: "ข่าวสาร  ",
-        link: "/main/promotions",
+        link: "/main/news",
       },
       {
         icon: <Gift className="h-5 w-5 text-blue-900" />,
@@ -85,21 +85,25 @@ export default function HomePage() {
         icon: <TicketPercent className="h-5 w-5" />,
         title: "Coupons",
         desc: "คูปองทั้งหมด",
+        link: "/main/mycoupon",
       },
       {
         icon: <Sparkles className="h-5 w-5" />,
         title: "Missions",
         desc: "ทำภารกิจรับแต้ม",
+        link: "/main/missions",
       },
       {
         icon: <Star className="h-5 w-5" />,
         title: "Tier Benefits",
         desc: "สิทธิ์ตามระดับสมาชิก",
+        link: "/main/tier-benefits",
       },
       {
         icon: <Flame className="h-5 w-5" />,
         title: "Hot Picks",
         desc: "แนะนำสำหรับคุณ",
+        link: "/main/promotions",
       },
     ],
     [],
@@ -183,14 +187,17 @@ export default function HomePage() {
           <div className="text-sm font-bold text-white/90">
             Promotions for you
           </div>
-          <Link href={"/main/promotions"} className="text-xs font-semibold text-sky-200 hover:text-sky-100">
+          <Link
+            href={"/main/promotions"}
+            className="text-xs font-semibold text-sky-200 hover:text-sky-100"
+          >
             See all
           </Link>
         </div>
 
         <div className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
           {promos.map((p) => (
-            <div
+            <Link href={"/main/promotions"}
               key={p.title}
               className="min-w-[84%] snap-start rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]"
@@ -214,14 +221,15 @@ export default function HomePage() {
                   Use now <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         <div className="mt-6 text-sm font-bold text-white/90">Explore</div>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {featuredServices.map((s) => (
-            <button
+            <Link
+              href={s.link}
               key={s.title}
               className="rounded-3xl border border-white/15 bg-white/10 p-4 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
@@ -243,16 +251,16 @@ export default function HomePage() {
               <div className="mt-4 flex items-center justify-end text-white/70">
                 <ChevronRight className="h-5 w-5" />
               </div>
-            </button>
+            </Link>
           ))}
         </div>
 
         {/* Feed / News */}
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm font-bold text-white/90">Updates</div>
-          <button className="text-xs font-semibold text-sky-200 hover:text-sky-100">
+          <Link href={"/main/news"} className="text-xs font-semibold text-sky-200 hover:text-sky-100">
             View more
-          </button>
+          </Link>
         </div>
 
         <div className="mt-3 space-y-3">
