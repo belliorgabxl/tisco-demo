@@ -145,7 +145,13 @@ export default async function RewardDetailPage({
             <p className="mt-2 text-lg text-white w-full text-center animate-pulse">
               Free Coupon
             </p>
-            <RedeemConfirm rewardId={reward.id} rewardTitle={reward.title} couponURL={reward.image} />
+            <RedeemConfirm
+              rewardId={reward.id}
+              rewardTitle={reward.title}
+              couponURL={reward.image}
+              pointType="TINSURE"
+              amount={100}
+            />
             <div className="mt-2 text-center text-[11px] text-white/55">
               * เพื่อสิทธิประโยชน์สูงสุด
               กรุณาอ่านเงื่อนไขและข้อกำหนดของรางวัลแต่ละรายการ

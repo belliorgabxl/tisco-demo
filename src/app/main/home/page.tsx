@@ -2,23 +2,23 @@
 
 import { useMemo, useState } from "react";
 import {
-  QrCode,
   ChevronRight,
   Search,
   Gift,
   TicketPercent,
-  Wallet,
   Sparkles,
   Star,
   Flame,
   Receipt,
+  Component,
+  Newspaper,
 } from "lucide-react";
 import UserBanner from "@/components/common/banner";
 import { PointType } from "@/resource/constant";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function HomePage() {
-  // const [pointType, setPointType] = useState<PointType>("TISCO");
   const router = useRouter();
   const [activePointType, setActivePointType] = useState<PointType>(() => {
     if (typeof window === "undefined") return "TISCO";
@@ -28,24 +28,28 @@ export default function HomePage() {
   const quickActions = useMemo(
     () => [
       {
-        icon: <QrCode className="h-5 w-5 text-blue-900" />,
-        title: "My QR",
-        subtitle: "สแกนรับสิทธิ์",
+        icon: <Newspaper className="h-5 w-5 text-blue-900" />,
+        title: "News",
+        subtitle: "ข่าวสาร  ",
+        link: "/main/promotions",
       },
       {
         icon: <Gift className="h-5 w-5 text-blue-900" />,
         title: "Redeem",
         subtitle: "แลกของรางวัล",
+        link: "/main/rewards",
       },
       {
-        icon: <Wallet className="h-5 w-5 text-blue-900" />,
-        title: "Wallet",
-        subtitle: "ดูเครดิต/แต้ม",
+        icon: <Component className="h-5 w-5 text-blue-900" />,
+        title: "My Coupon",
+        subtitle: "คูปองของฉัน",
+        link: "/main/mycoupon",
       },
       {
         icon: <Receipt className="h-5 w-5 text-blue-900" />,
         title: "History",
         subtitle: "รายการล่าสุด",
+        link: "/main/history",
       },
     ],
     [],
@@ -134,7 +138,7 @@ export default function HomePage() {
             onOpenNotifications={() => console.log("open notifications")}
             onAccountChange={(next) => {
               setActivePointType(next);
-              router.refresh(); 
+              router.refresh();
             }}
           />
         </div>
@@ -154,9 +158,10 @@ export default function HomePage() {
         {/* Quick Actions */}
         <div className="mt-4 z-0 grid grid-cols-4 gap-2">
           {quickActions.map((a) => (
-            <button
+            <Link
+              href={a.link}
               key={a.title}
-              className="group rounded-2xl grid place-items-center border border-white/15 bg-white/10 p-3 text-left backdrop-blur-xl
+              className="group rounded-2xl grid place-items-center border border-white/15 bg-white/10 px-2 py-3 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
               hover:bg-white/15 active:scale-[0.99] transition"
             >
@@ -169,7 +174,7 @@ export default function HomePage() {
               <div className="mt-0.5 text-[10px] text-white/65">
                 {a.subtitle}
               </div>
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -178,9 +183,9 @@ export default function HomePage() {
           <div className="text-sm font-bold text-white/90">
             Promotions for you
           </div>
-          <button className="text-xs font-semibold text-sky-200 hover:text-sky-100">
+          <Link href={"/main/promotions"} className="text-xs font-semibold text-sky-200 hover:text-sky-100">
             See all
-          </button>
+          </Link>
         </div>
 
         <div className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">

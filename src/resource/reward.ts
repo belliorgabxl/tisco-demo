@@ -1,23 +1,43 @@
-export type RewardDetail = {
+import { PointType, RewardPointAction } from "./constant";
+
+export type RewardType = "coupon" | "points";
+
+export type RewardDetailBase = {
   id: string;
   title: string;
   desc: string;
   image: string;
   badge?: string;
-  points: number;
   tier?: string;
+  points: number;
   highlights: string[];
   howToUse: string[];
+};
+
+export type RewardDetail = CouponRewardDetail | PointsRewardDetail;
+
+export type CouponRewardDetail = RewardDetailBase & {
+  rewardType: "coupon";
+  pointAction: { mode: "spend"; pointType: PointType; amount: number };
+};
+
+export type PointsRewardDetail = RewardDetailBase & {
+  rewardType: "points";
+  pointAction: { mode: "earn"; pointType: PointType; amount: number };
 };
 
 export const REWARDS: Record<string, RewardDetail> = {
   "free-coupon": {
     id: "free-coupon",
     title: "Free Coupon",
-    desc: "แลกของรางวัล / ดีลเด็ด",
+    desc: "แลกของรางวัล / ดีลเด็ด ใช้ได้ภายใน 30 วันหลังแลก",
     image: "/data/reward/reward-1.png",
     badge: "NEW",
     points: 10,
+
+    rewardType: "coupon",
+    pointAction: { mode: "spend", pointType: "TISCO", amount: 10 },
+
     highlights: [
       "คูปองใช้ได้กับร้านค้าที่ร่วมรายการ",
       "ใช้ได้ภายใน 30 วันหลังแลก",
@@ -33,20 +53,24 @@ export const REWARDS: Record<string, RewardDetail> = {
   "tisco-100-points": {
     id: "tisco-100-points",
     title: "100 TISCO Points",
-    desc: "สิทธิพิเศษตาม Tier",
+    desc: "รับแต้มเพิ่มสำหรับสิทธิพิเศษตาม Tier",
     image: "/data/reward/reward-2.png",
     badge: "VIP",
     points: 100,
+
+    rewardType: "points",
+    pointAction: { mode: "earn", pointType: "TISCO", amount: 100 },
+
     tier: "Gold+",
     highlights: [
       "สิทธิ์เฉพาะสมาชิก Tier ที่กำหนด",
-      "เหมาะสำหรับแลกส่วนลดทันที",
+      "ได้แต้มเพิ่มทันทีหลังยืนยัน",
       "รองรับแคมเปญบางช่วงเวลา",
     ],
     howToUse: [
-      "ตรวจสอบ Tier ก่อนแลก",
-      "กด Redeem แล้วระบบจะตัดแต้ม",
-      "สิทธิ์จะถูกเพิ่มในบัญชีของคุณทันที",
+      "ตรวจสอบ Tier ก่อนทำรายการ",
+      "กด Redeem เพื่อรับแต้ม",
+      "แต้มจะถูกเพิ่มเข้าบัญชีของคุณทันที",
     ],
   },
 
@@ -57,6 +81,10 @@ export const REWARDS: Record<string, RewardDetail> = {
     image: "/data/reward/reward-3.png",
     badge: "HOT",
     points: 10,
+
+    rewardType: "coupon",
+    pointAction: { mode: "spend", pointType: "TISCO", amount: 10 },
+
     highlights: [
       "ใช้แต้มแลกคูปองส่วนลดได้ทันที",
       "ใช้ได้กับดีลที่ร่วมรายการ",
@@ -76,6 +104,10 @@ export const REWARDS: Record<string, RewardDetail> = {
     image: "/data/reward/reward-4.png",
     badge: "TInsure",
     points: 50,
+
+    rewardType: "coupon",
+    pointAction: { mode: "spend", pointType: "TINSURE", amount: 50 },
+
     highlights: [
       "สิทธิ์ส่วนลดประกันตามรายการ",
       "ใช้ได้กับแผนที่ร่วมรายการ",
@@ -95,6 +127,10 @@ export const REWARDS: Record<string, RewardDetail> = {
     image: "/data/reward/reward-5.png",
     badge: "TWealth",
     points: 80,
+
+    rewardType: "coupon",
+    pointAction: { mode: "spend", pointType: "TWEALTH", amount: 80 },
+
     highlights: [
       "สิทธิ์เข้าร่วมกิจกรรมพิเศษ",
       "เหมาะสำหรับลูกค้า TWealth",

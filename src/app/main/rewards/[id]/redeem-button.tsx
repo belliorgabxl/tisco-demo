@@ -3,42 +3,89 @@
 import { useEffect, useState } from "react";
 import { ChevronRight, X, Sparkles, ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+type PointType = "TISCO" | "TWEALTH" | "TINSURE";
 
 type Props = {
   rewardId: string;
   rewardTitle?: string;
   couponURL: string;
-  onUseNow?: () => void;
-  onUseLater?: () => void;
+
+  pointType: PointType;
+  amount: number;
+
+  redeemEndpoint?: string;
+  onUseNow?: (data: any) => void;
+  onUseLater?: (data: any) => void;
 };
 
 export default function RedeemConfirm({
   rewardId,
   rewardTitle = "Reward",
   couponURL,
+  pointType,
+  amount,
+  redeemEndpoint = "/api/mycoupon/redeem",
   onUseNow,
   onUseLater,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState<"now" | "later" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   function close() {
+    if (loading) return;
     setOpen(false);
-    setLoading(null);
+    setError(null);
+  }
+
+  async function redeem(mode: "now" | "later") {
+    const res = await fetch(redeemEndpoint, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ rewardId, mode }),
+    });
+
+    const json = await res.json().catch(() => ({}));
+
+    if (!res.ok || json?.success === false) {
+      throw new Error(json?.message || `Redeem failed (${res.status})`);
+    }
+
+    return json.data;
   }
 
   async function confirm(mode: "now" | "later") {
     setLoading(mode);
+    setError(null);
+
     try {
-      if (mode === "now") onUseNow?.();
-      if (mode === "later") onUseLater?.();
-      close();
+      const data = await redeem(mode);
+
+      setOpen(false);
+
+      if (mode === "now") {
+        onUseNow?.(data);
+        router.push(`/main/mycoupon/${data.userCouponId}`);
+        return;
+      }
+
+      onUseLater?.(data);
+      router.push("/main/mycoupon");
+    } catch (e: any) {
+      setError(e?.message ?? "Something went wrong");
     } finally {
       setLoading(null);
     }
   }
 
-  // ESC to close
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -46,7 +93,8 @@ export default function RedeemConfirm({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, loading]);
 
   return (
     <>
@@ -64,22 +112,21 @@ export default function RedeemConfirm({
 
       {open && (
         <div className="fixed inset-0 z-[9999]">
-          {/* premium backdrop */}
+          {/* backdrop */}
           <button
             type="button"
             aria-label="Close"
             onClick={close}
-            className="absolute inset-0 bg-black/60 backdrop-blur-[6px]"
+            disabled={!!loading}
+            className="absolute inset-0 bg-black/60 backdrop-blur-[6px] disabled:cursor-not-allowed"
           />
 
-          {/* subtle glow layers */}
           <div
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 blur-2xl opacity-50
               bg-[radial-gradient(circle_at_30%_30%,rgba(88,197,255,0.35),transparent_55%),radial-gradient(circle_at_70%_70%,rgba(255,120,180,0.18),transparent_60%)]"
           />
 
-          {/* modal */}
           <div className="absolute left-1/2 top-1/2 w-[92vw] max-w-[430px] -translate-x-1/2 -translate-y-1/2">
             <div
               className="relative overflow-hidden rounded-3xl border border-white/15 bg-[#07162F]/85 p-4
@@ -87,14 +134,12 @@ export default function RedeemConfirm({
                 backdrop-blur-2xl
                 animate-[pop_160ms_ease-out]"
             >
-              {/* top sheen */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 opacity-60
                   bg-[radial-gradient(1200px_240px_at_50%_0%,rgba(255,255,255,0.10),transparent_60%)]"
               />
 
-              {/* header */}
               <div className="relative flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="inline-flex items-center gap-2 text-xs font-extrabold tracking-wide text-white/80">
@@ -111,24 +156,27 @@ export default function RedeemConfirm({
                   <div className="mt-2 truncate text-[15px] font-extrabold text-white/95">
                     {rewardTitle}
                   </div>
+
                   <div className="mt-0.5 text-xs text-white/60">
-                    Confirm to redeem this coupon now or save for later
+                    ใช้แต้ม {pointType} จำนวน{" "}
+                    <span className="text-white/85 font-bold">{amount}</span>{" "}
+                    แต้ม เพื่อแลกคูปอง
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={close}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-2 text-white/80 hover:bg-white/15 active:scale-[0.98] transition"
+                  disabled={!!loading}
+                  className="rounded-2xl border border-white/10 bg-white/10 p-2 text-white/80 hover:bg-white/15 active:scale-[0.98] transition
+                    disabled:opacity-60 disabled:cursor-not-allowed"
                   aria-label="Close popup"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* preview */}
               <div className="relative mt-4 overflow-hidden rounded-2xl border border-white/12 bg-white/5">
-                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" /> */}
                 <div className="p-3">
                   <div className="flex justify-center">
                     <div className="relative h-[220px] w-[220px] overflow-hidden rounded-2xl ring-1 ring-white/15 bg-white/5">
@@ -144,17 +192,23 @@ export default function RedeemConfirm({
                   </div>
 
                   <div className="mt-3 text-center">
-                    <div className=" font-bold text-white">
+                    <div className="font-bold text-white">
                       Confirm to redeem coupon
                     </div>
                     <div className="mt-0.5 text-[11px] text-white/55">
-                      rewardId: <span className="text-white/75">{rewardId}</span>
+                      rewardId:{" "}
+                      <span className="text-white/75">{rewardId}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* actions */}
+              {error ? (
+                <div className="relative mt-3 rounded-2xl border border-rose-300/20 bg-rose-400/10 px-3 py-2 text-xs text-rose-50">
+                  {error}
+                </div>
+              ) : null}
+
               <div className="relative mt-4 grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -182,10 +236,9 @@ export default function RedeemConfirm({
               </div>
 
               <div className="relative mt-3 text-center text-[11px] text-white/50">
-                * คุณสามารถดูคูปองทั้งหมดได้ในหน้า My Rewards
+                * คุณสามารถดูคูปองทั้งหมดได้ในหน้า My Coupon
               </div>
 
-              {/* keyframes (no extra file) */}
               <style>{`
                 @keyframes pop {
                   from { transform: translateY(10px) scale(.985); opacity: .0; }

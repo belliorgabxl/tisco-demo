@@ -72,6 +72,9 @@ const CouponSchema = new Schema(
       min: 0,
     },
 
+    rewardId: { type: String, required: false, index: true, unique: true },
+    image: { type: String, required: false },
+
     // จำนวนที่ถูกใช้ไปแล้ว (tracking)
     usedCount: {
       type: Number,

@@ -32,11 +32,10 @@ export async function POST(
 
     await connectDB();
 
-    const { id } = await params; // id is now uniqueCode
+    const { id } = await params;
     const userId = decoded.userId;
     const uniqueCode = id;
 
-    // Find UserCoupon by uniqueCode instead of _id
     const userCoupon = await UserCoupon.findOne({ uniqueCode }).populate(
       "couponId",
     );
@@ -47,7 +46,6 @@ export async function POST(
       );
     }
 
-    // Verify ownership
     if (userCoupon.userId.toString() !== userId) {
       return NextResponse.json(
         { success: false, message: "This coupon does not belong to you" },
@@ -55,7 +53,6 @@ export async function POST(
       );
     }
 
-    // Check status is REDEEMED
     if (userCoupon.status !== UserCouponStatus.REDEEMED) {
       return NextResponse.json(
         { success: false, message: "Coupon is not in REDEEMED status" },
@@ -70,19 +67,16 @@ export async function POST(
       );
     }
 
-    // Update status
     userCoupon.status = UserCouponStatus.USED;
     userCoupon.usedAt = new Date();
     await userCoupon.save();
 
-    // Update coupon template's
     const coupon = await Coupon.findById(userCoupon.couponId);
     if (coupon) {
       coupon.usedCount = (coupon.usedCount || 0) + 1;
       await coupon.save();
     }
 
-    // Log history
     await logCouponUse(userId, userCoupon.couponId, {
       userCouponId: userCoupon._id,
       couponTitle: userCoupon.metadata?.couponTitle,
