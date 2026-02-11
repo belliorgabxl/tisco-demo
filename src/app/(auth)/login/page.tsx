@@ -1,7 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Lock, User } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Facebook,
+  Globe,
+  Lock,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -78,13 +85,14 @@ export default function LoginPage() {
       <section className="w-full max-w-[420px] relative min-h-screen flex flex-col pt-2">
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <a
+          <div></div>
+          {/* <a
             href="/"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
           >
             <ArrowLeft className="h-5 w-5" />
             กลับหน้าแรก
-          </a>
+          </a> */}
 
           <div className="inline-flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-rose-400/90 shadow-[0_0_0_6px_rgba(244,63,94,0.12)]" />
@@ -114,10 +122,6 @@ export default function LoginPage() {
               Tisco Loyalty
             </span>
           </h1>
-
-          <p className="mt-3 text-sm leading-relaxed text-white/75">
-            เข้าสู่ระบบเพื่อจัดการสิทธิประโยชน์และข้อมูลสมาชิกอย่างแม่นยำและเสถียร
-          </p>
         </div>
 
         {/* Form card */}
@@ -177,12 +181,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !canSubmit}
-              className="group h-[52px] rounded-2xl font-extrabold tracking-wide
+              className="group h-[52px] rounded-lg font-extrabold tracking-wide
                 flex items-center justify-center text-white
                 bg-gradient-to-br from-sky-300 to-blue-600
-                shadow-[0_18px_38px_rgba(45,110,255,0.35),0_8px_18px_rgba(88,197,255,0.18)]
-                border border-white/10
-                disabled:opacity-60 disabled:cursor-not-allowed
+               
+                disabled:opacity-80 disabled:cursor-not-allowed
                 active:scale-[0.99] hover:-translate-y-[1px] transition"
             >
               {loading ? (
@@ -212,16 +215,61 @@ export default function LoginPage() {
                 {msg}
               </div>
             ) : null}
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-xs text-white/55">or continue with</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            {/* Social buttons */}
+            <div className="flex justify-center gap-1">
+              {/* LINE */}
+              <button
+                type="button"
+                onClick={() => setMsg("LINE login is not connected yet.")}
+                className="h-12 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-bold text-white/85
+             hover:bg-white/8 active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+              >
+                <Image
+                  src="/logo/line-logo.png"
+                  height={100}
+                  width={100}
+                  alt="line-logo.png"
+                  className="h-6 w-6 object-cover"
+                />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMsg("LINE login is not connected yet.")}
+                className="h-12 rounded-2xl border border-white/10 bg-white/5 px-4 text-sm font-bold text-white/85
+             hover:bg-white/8 active:scale-[0.99] transition inline-flex items-center justify-center gap-2"
+              >
+                <Image
+                  src="/logo/google-logo.png"
+                  height={100}
+                  width={100}
+                  alt="line-logo.png"
+                  className="h-6 w-6 object-cover"
+                />
+              </button>
+            </div>
+
+            {/* Small hint */}
+            <p className="text-xs text-center text-white/50 font-medium leading-relaxed">
+               You can still sign in with username &
+              password.
+            </p>
 
             {/* Bottom link */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-white/60">ยังไม่มีบัญชี?</span>
               <a
                 href="/register"
-                className="font-extrabold flex gap-2 items-center text-sky-200 hover:text-sky-100 transition"
+                className="font-extrabold flex gap-2 border-b border-sky-200/80 items-center text-sky-200 hover:text-sky-100 transition"
               >
                 ไปหน้าสมัครสมาชิก
-                <ArrowRight className="h-4 w-4" />
+                {/* <ArrowRight className="h-4 w-4" /> */}
               </a>
             </div>
           </form>
