@@ -1,17 +1,34 @@
 "use client";
 
 import UserBanner from "@/components/common/banner";
-import { PointType } from "@/resource/constant";
+import { ACTIVE_POINT_TYPE_KEY, PointType } from "@/resource/constant";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { REWARDS } from "@/resource/reward";
+import ThemeBackground from "@/components/theme-background";
 
-export default function HomePage() {
+export default function RewardPage() {
   const router = useRouter();
   const [activePointType, setActivePointType] = useState<PointType>("TISCO");
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(ACTIVE_POINT_TYPE_KEY);
+      const t = String(saved ?? "").toUpperCase();
+
+      if (t === "TISCO" || t === "TINSURE" || t === "TWEALTH") {
+        setActivePointType(t as PointType);
+      } else {
+        setActivePointType("TISCO");
+        sessionStorage.setItem(ACTIVE_POINT_TYPE_KEY, "TISCO");
+      }
+    } catch {
+      setActivePointType("TISCO");
+    }
+  }, []);
 
   const rewardCards = useMemo(() => {
     const order = [
@@ -37,29 +54,7 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10
-        bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-45
-        [background-image:linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)]
-        [background-size:28px_28px]
-        [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -top-44 -left-40 -z-10 h-[520px] w-[520px] blur-[2px]
-        bg-[radial-gradient(circle_at_30%_30%,rgba(88,197,255,0.30),transparent_60%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-56 -right-48 -z-10 h-[560px] w-[560px] blur-[2px]
-        bg-[radial-gradient(circle_at_60%_60%,rgba(45,110,255,0.26),transparent_62%)]"
-      />
-
+      <ThemeBackground type={activePointType} /> 
       <section className="w-full max-w-[520px] relative pb-28">
         <div className="relative z-50">
           <UserBanner
@@ -68,7 +63,7 @@ export default function HomePage() {
             onOpenNotifications={() => console.log("open notifications")}
             onAccountChange={(next) => {
               setActivePointType(next);
-              router.refresh();
+              // router.refresh();
             }}
           />
         </div>
@@ -95,7 +90,7 @@ export default function HomePage() {
               className="group overflow-hidden rounded-3xl border border-white/15 bg-white/10 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
               hover:bg-white/15 active:scale-[0.995] transition"
-                  >
+            >
               <div className="relative w-full aspect-[16/10] overflow-hidden">
                 <Image
                   src={c.image}

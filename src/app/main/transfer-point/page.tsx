@@ -52,7 +52,7 @@ const ALL_POINT_TYPES: {
   {
     key: "JPOINT",
     title: "J-Point",
-    desc: "แต้มหลักของระบบ ใช้แลกสิทธิพิเศษทั่วไป",
+    desc: "ระบบสะสมคะแนนในเครือเจมาร์ท",
     icon: (
       <Image
         src="/logo/jpoint-logo.png"
@@ -247,7 +247,7 @@ export default function Page() {
                               {it.title}
                             </p>
                           </div>
-                          <p className="mt-1 text-sm text-sky-100/70 line-clamp-1">
+                          <p className="mt-1 text-xs text-sky-100/70 line-clamp-1">
                             {it.desc}
                           </p>
                         </div>

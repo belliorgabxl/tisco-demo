@@ -1,7 +1,7 @@
 "use client";
 
 import UserBanner from "@/components/common/banner";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -18,6 +18,8 @@ import {
   Crown,
   Bell,
 } from "lucide-react";
+import ThemeBackground from "@/components/theme-background";
+import { ACTIVE_POINT_TYPE_KEY, PointType } from "@/resource/constant";
 
 export default function MePage() {
   const router = useRouter();
@@ -118,22 +120,18 @@ export default function MePage() {
     router.replace("/login");
     router.refresh();
   }
+  const [activePointType, setActivePointType] = useState<PointType>("TISCO");
+  useEffect(() => {
+    const saved = sessionStorage.getItem(
+      ACTIVE_POINT_TYPE_KEY,
+    ) as PointType | null;
+    if (saved) setActivePointType(saved);
+  }, []);
 
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
       {/* background */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10
-        bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-45
-        [background-image:linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)]
-        [background-size:28px_28px]
-        [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
-      />
+      <ThemeBackground type={activePointType} />
 
       <section className="w-full max-w-[520px] relative pb-28">
         {/* Header */}
@@ -154,8 +152,8 @@ export default function MePage() {
             meEndpoint="/api/auth/me"
             onRedeem={() => router.push("/rewards")}
             onOpenNotifications={() => router.push("/me/notifications")}
-            onAccountChange={() => {
-              // ถ้าอยากให้ me หน้านี้ refetch ทั้งหน้า
+            onAccountChange={(next) => {
+              setActivePointType(next);
               router.refresh();
             }}
           />

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -18,9 +18,10 @@ import {
   Sparkles,
   Wallet as WalletIcon,
 } from "lucide-react";
-import { PointType } from "@/resource/constant";
+import { ACTIVE_POINT_TYPE_KEY, PointType } from "@/resource/constant";
 import { formatNumber } from "@/libs/utils/format";
 import WalletActivePointCard from "@/components/common/wallet-active-point-card";
+import ThemeBackground from "@/components/theme-background";
 
 type WalletTxn = {
   id: string;
@@ -69,6 +70,22 @@ export default function WalletPage() {
       TINSURE: 3200,
       TWEALTH: 780,
     } satisfies Record<PointType, number>;
+  }, []);
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(ACTIVE_POINT_TYPE_KEY);
+      const t = String(saved ?? "").toUpperCase();
+
+      if (t === "TISCO" || t === "TINSURE" || t === "TWEALTH") {
+        setActiveType(t as PointType);
+      } else {
+        setActiveType("TISCO");
+        sessionStorage.setItem(ACTIVE_POINT_TYPE_KEY, "TISCO");
+      }
+    } catch {
+      setActiveType("TISCO");
+    }
   }, []);
 
   const txns: WalletTxn[] = useMemo(
@@ -148,18 +165,7 @@ export default function WalletPage() {
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
       {/* Background */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10
-        bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-45
-        [background-image:linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)]
-        [background-size:28px_28px]
-        [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
-      />
+      <ThemeBackground type={activeType} />
 
       <section className="w-full max-w-[520px] relative pb-28">
         {/* Top bar */}
@@ -192,7 +198,7 @@ export default function WalletPage() {
           <WalletActivePointCard
             onAmountChange={({ type, amount }) => {
               console.log("active type:", type, "amount:", amount);
-              setActiveAmount(amount)
+              setActiveAmount(amount);
             }}
             meEndpoint="/api/auth/me"
             storageKey="activePointType"
@@ -219,7 +225,8 @@ export default function WalletPage() {
             </div>
           </button>
 
-          <Link href={"/main/transfer-point"}
+          <Link
+            href={"/main/transfer-point"}
             type="button"
             onClick={() => console.log("transfer")}
             className="group rounded-3xl border border-white/15 bg-white/10 p-4 text-left backdrop-blur-xl
@@ -231,7 +238,9 @@ export default function WalletPage() {
             </div>
 
             <div>
-              <p className=" text-sm font-extrabold text-white/90">Transfer-Point</p>
+              <p className=" text-sm font-extrabold text-white/90">
+                Transfer-Point
+              </p>
               <p className="mt-1 text-xs text-white/60">
                 โอนแต้ม / ส่งต่อสิทธิ์
               </p>
@@ -281,7 +290,9 @@ export default function WalletPage() {
           </div>
           <div className="text-xs font-semibold text-white/70">
             Balance:{" "}
-            <span className="text-sm text-white/90">{formatNumber(activeAmount)}</span>
+            <span className="text-sm text-white/90">
+              {formatNumber(activeAmount)}
+            </span>
           </div>
         </div>
 

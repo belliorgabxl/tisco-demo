@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronRight,
   Search,
@@ -14,17 +14,28 @@ import {
   Newspaper,
 } from "lucide-react";
 import UserBanner from "@/components/common/banner";
-import { PointType } from "@/resource/constant";
+import { ACTIVE_POINT_TYPE_KEY, PointType } from "@/resource/constant";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ThemeBackground from "@/components/theme-background";
 
 export default function HomePage() {
   const router = useRouter();
-  const [activePointType, setActivePointType] = useState<PointType>(() => {
-    if (typeof window === "undefined") return "TISCO";
-    const v = sessionStorage.getItem("activePointType") as PointType | null;
-    return v === "TINSURE" || v === "TWEALTH" ? v : "TISCO";
-  });
+  // const [activePointType, setActivePointType] = useState<PointType>(() => {
+  //   if (typeof window === "undefined") return "TISCO";
+  //   const v = sessionStorage.getItem("activePointType") as PointType | null;
+  //   return v === "TINSURE" || v === "TWEALTH" ? v : "TISCO";
+  // });
+
+  const [activePointType, setActivePointType] = useState<PointType>("TISCO");
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem(
+      ACTIVE_POINT_TYPE_KEY,
+    ) as PointType | null;
+    if (saved) setActivePointType(saved);
+  }, []);
+
   const quickActions = useMemo(
     () => [
       {
@@ -109,29 +120,8 @@ export default function HomePage() {
     [],
   );
   return (
-    <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10
-        bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-45
-        [background-image:linear-gradient(rgba(255,255,255,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.2)_1px,transparent_1px)]
-        [background-size:28px_28px]
-        [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -top-44 -left-40 -z-10 h-[520px] w-[520px] blur-[2px]
-        bg-[radial-gradient(circle_at_30%_30%,rgba(88,197,255,0.30),transparent_60%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-56 -right-48 -z-10 h-[560px] w-[560px] blur-[2px]
-        bg-[radial-gradient(circle_at_60%_60%,rgba(45,110,255,0.26),transparent_62%)]"
-      />
+    <main className="relative bg-fixed min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
+      <ThemeBackground type={activePointType} />
 
       {/* Page */}
       <section className="w-full max-w-[520px] relative pb-28">
@@ -197,7 +187,8 @@ export default function HomePage() {
 
         <div className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
           {promos.map((p) => (
-            <Link href={"/main/promotions"}
+            <Link
+              href={"/main/promotions"}
               key={p.title}
               className="min-w-[84%] snap-start rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]"
@@ -258,7 +249,10 @@ export default function HomePage() {
         {/* Feed / News */}
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm font-bold text-white/90">Updates</div>
-          <Link href={"/main/news"} className="text-xs font-semibold text-sky-200 hover:text-sky-100">
+          <Link
+            href={"/main/news"}
+            className="text-xs font-semibold text-sky-200 hover:text-sky-100"
+          >
             View more
           </Link>
         </div>
