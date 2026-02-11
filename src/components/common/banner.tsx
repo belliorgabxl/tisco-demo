@@ -63,7 +63,7 @@ export default function UserBanner({
       const saved = sessionStorage.getItem(
         ACTIVE_POINT_TYPE_KEY,
       ) as PointType | null;
-      if (saved === "TISCO" || saved === "TINSURE" || saved === "TWEALTH") {
+      if (saved === "TISCO" || saved === "TINSURE" || saved === "TWEALTH" || saved==="JPOINT") {
         setActiveType(saved);
       } else {
         sessionStorage.setItem(ACTIVE_POINT_TYPE_KEY, "TISCO");

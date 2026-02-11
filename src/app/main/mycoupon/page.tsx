@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, Search, Ticket, Clock3, BadgeCheck } from "lucide-react";
 
-type UserCouponStatus = "active" | "used" | "expired" | "suspended";
+type UserCouponStatus = "active" | "used" | "expired" | "suspended" | "saved";
 type PointType = "TISCO" | "TWEALTH" | "TINSURE";
 
 type MyCouponItem = {
@@ -42,6 +42,11 @@ function statusLabel(s: UserCouponStatus) {
     return {
       text: "พร้อมใช้",
       cls: "bg-emerald-400/10 border-emerald-300/20 text-emerald-100",
+    };
+  if (s === "saved")
+    return {
+      text: "เก็บไว้",
+      cls: "bg-amber-400/10 border-amber-300/20 text-amber-100",
     };
   if (s === "used")
     return {
@@ -119,12 +124,14 @@ export default function MyCouponPage() {
     const s = {
       all: items.length,
       active: 0,
+      saved: 0,
       used: 0,
       expired: 0,
       suspended: 0,
     };
     for (const it of items) {
       if (it.status === "active") s.active++;
+      else if (it.status === "saved") s.saved++;
       else if (it.status === "used") s.used++;
       else if (it.status === "expired") s.expired++;
       else if (it.status === "suspended") s.suspended++;
@@ -192,6 +199,7 @@ export default function MyCouponPage() {
               [
                 ["all", `ทั้งหมด (${stats.all})`],
                 ["active", `พร้อมใช้ (${stats.active})`],
+                ["saved", `เก็บไว้ (${stats.saved})`],
                 ["used", `ใช้แล้ว (${stats.used})`],
                 ["expired", `หมดอายุ (${stats.expired})`],
               ] as const

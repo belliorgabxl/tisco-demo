@@ -219,7 +219,7 @@ export default function WalletPage() {
             </div>
           </button>
 
-          <button
+          <Link href={"/main/transfer-point"}
             type="button"
             onClick={() => console.log("transfer")}
             className="group rounded-3xl border border-white/15 bg-white/10 p-4 text-left backdrop-blur-xl
@@ -231,12 +231,12 @@ export default function WalletPage() {
             </div>
 
             <div>
-              <p className=" text-sm font-extrabold text-white/90">Transfer</p>
+              <p className=" text-sm font-extrabold text-white/90">Transfer-Point</p>
               <p className="mt-1 text-xs text-white/60">
                 โอนแต้ม / ส่งต่อสิทธิ์
               </p>
             </div>
-          </button>
+          </Link>
 
           <button
             type="button"

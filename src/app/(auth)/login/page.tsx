@@ -117,7 +117,6 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-[30px] leading-[1.1] font-extrabold tracking-[-0.6px]">
-            เข้าสู่ระบบ <br />
             <span className="bg-gradient-to-r from-sky-300 via-blue-500 to-rose-400 bg-clip-text text-transparent">
               Tisco Loyalty
             </span>
@@ -194,12 +193,7 @@ export default function LoginPage() {
                   กำลังเข้าสู่ระบบ...
                 </span>
               ) : (
-                <>
-                  เข้าสู่ระบบ
-                  <span className="ml-2 text-lg opacity-90 transition group-hover:translate-x-0.5">
-                    <ArrowRight className="h-5 w-5" />
-                  </span>
-                </>
+                <>เข้าสู่ระบบ</>
               )}
             </button>
 
@@ -257,8 +251,7 @@ export default function LoginPage() {
 
             {/* Small hint */}
             <p className="text-xs text-center text-white/50 font-medium leading-relaxed">
-               You can still sign in with username &
-              password.
+              You can still sign in with username & password.
             </p>
 
             {/* Bottom link */}

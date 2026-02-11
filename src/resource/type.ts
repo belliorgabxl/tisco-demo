@@ -5,7 +5,7 @@ export type MeResponse = {
   tier: string;
   memberNo: string;
   avatarUrl: string;
-  pointsByType: Record<"TISCO" | "TINSURE" | "TWEALTH", number>;
+  pointsByType: Record<"TISCO" | "TINSURE" | "TWEALTH" , number>;
 };
 
 export type ActivePointCardProps = {
@@ -16,4 +16,15 @@ export type ActivePointCardProps = {
 
 export type Balances = Record<PointType, number>;
 
-export const DEFAULT_BALANCES: Balances = { TISCO: 0, TINSURE: 0, TWEALTH: 0 };
+export const DEFAULT_BALANCES: Balances = {
+  TISCO: 0,
+  TINSURE: 0,
+  TWEALTH: 0
+};
+
+export type CreditSummary = {
+  tiscoPoint: number;
+  twealthPoint: number;
+  tinsurePoint: number;
+  totalPoints: number;
+};
