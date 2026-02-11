@@ -22,6 +22,9 @@ function calcAge(dateStr: string) {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [docType, setDocType] = useState<"nationalId" | "passport">(
+    "nationalId",
+  );
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -130,7 +133,10 @@ export default function RegisterPage() {
       <section className="w-full max-w-105 relative min-h-screen flex flex-col pt-2">
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <a
+          <div>
+            
+          </div>
+          {/* <a
             href="/"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
           >
@@ -138,7 +144,7 @@ export default function RegisterPage() {
               <ArrowLeft className="text-white h-5 w-5" />
             </span>
             กลับหน้าแรก
-          </a>
+          </a> */}
 
           <div className="inline-flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-rose-400/90 shadow-[0_0_0_6px_rgba(244,63,94,0.12)]" />
@@ -286,7 +292,7 @@ export default function RegisterPage() {
                   <Field label="สัญชาติ" hint="เลือกได้">
                     <input
                       className={inputBase}
-                      placeholder="เช่น Thai"
+                      placeholder="เช่น ไทย"
                       value={form.nationality}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, nationality: e.target.value }))
@@ -297,7 +303,7 @@ export default function RegisterPage() {
                   <Field label="ศาสนา" hint="เลือกได้">
                     <input
                       className={inputBase}
-                      placeholder="เช่น Buddhism"
+                      placeholder="เช่น พุทธ"
                       value={form.religion}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, religion: e.target.value }))
@@ -319,35 +325,68 @@ export default function RegisterPage() {
               <p className="text-[12px] leading-relaxed text-white/55">
                 ในระบบจริงจะมีการกำกับสิทธิ์/การเข้ารหัส/เหตุผลการเก็บข้อมูลตามนโยบาย
               </p>
-              {form.nationalId.trim() === "" &&
-              form.passportNumber.trim() === "" ? (
-                <div className="mt-3 rounded-2xl border border-rose-300/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
-                  กรุณากรอก <b>เลขบัตรประชาชน</b> หรือ <b>Passport Number</b>{" "}
-                  อย่างใดอย่างหนึ่ง
-                </div>
-              ) : null}
-              <div className="mt-3 grid gap-3">
-                <Field label="เลขบัตรประชาชน" hint="optional">
-                  <input
-                    className={inputBase}
-                    placeholder="x-xxxx-xxxxx-xx-x"
-                    value={form.nationalId}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, nationalId: e.target.value }))
-                    }
-                  />
-                </Field>
+              <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-black/20 p-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDocType("nationalId");
+                    setForm((p) => ({ ...p, passportNumber: "" }));
+                  }}
+                  className={[
+                    "h-11 rounded-2xl text-sm font-extrabold transition border",
+                    docType === "nationalId"
+                      ? "bg-white/12 border-white/20 text-white"
+                      : "bg-white/5 border-white/10 text-white/70 hover:bg-white/8 hover:text-white",
+                  ].join(" ")}
+                >
+                  เลขบัตรประชาชน
+                </button>
 
-                <Field label="Passport Number" hint="optional">
-                  <input
-                    className={inputBase}
-                    placeholder="เช่น AA1234567"
-                    value={form.passportNumber}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, passportNumber: e.target.value }))
-                    }
-                  />
-                </Field>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDocType("passport");
+                    setForm((p) => ({ ...p, nationalId: "" }));
+                  }}
+                  className={[
+                    "h-11 rounded-2xl text-sm font-extrabold transition border",
+                    docType === "passport"
+                      ? "bg-white/12 border-white/20 text-white"
+                      : "bg-white/5 border-white/10 text-white/70 hover:bg-white/8 hover:text-white",
+                  ].join(" ")}
+                >
+                  Passport
+                </button>
+              </div>
+              <div className="mt-3 grid gap-3">
+                {docType === "nationalId" ? (
+                  <Field label="เลขบัตรประชาชน" hint="optional">
+                    <input
+                      className={inputBase}
+                      placeholder="x-xxxx-xxxxx-xx-x"
+                      value={form.nationalId}
+                      maxLength={13}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, nationalId: e.target.value }))
+                      }
+                    />
+                  </Field>
+                ) : (
+                  <Field label="Passport Number" hint="optional">
+                    <input
+                      className={inputBase}
+                      maxLength={20}
+                      placeholder="เช่น AA1234567"
+                      value={form.passportNumber}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          passportNumber: e.target.value,
+                        }))
+                      }
+                    />
+                  </Field>
+                )}
               </div>
             </div>
 
