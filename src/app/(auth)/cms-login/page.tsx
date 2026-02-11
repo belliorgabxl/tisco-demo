@@ -29,7 +29,7 @@ export default function CMSLoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
       // For demo purposes, accept any credentials
-      router.push("/dashboard");
+      router.push("/cms");
     } catch {
       setMsg("Network error. Please try again.");
     } finally {

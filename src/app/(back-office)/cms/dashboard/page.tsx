@@ -212,109 +212,78 @@ export default function DashboardPage() {
       : campaigns.filter((c) => c.company === campaignFilter);
 
   return (
-    <div className="relative min-h-screen overflow-hidden text-sky-50">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10
-        bg-[radial-gradient(1200px_600px_at_20%_10%,rgba(88,197,255,0.28),transparent_55%),radial-gradient(900px_500px_at_90%_25%,rgba(45,110,255,0.22),transparent_58%),linear-gradient(180deg,#07162F_0%,#061225_55%,#040A14_100%)]"
-      />
-
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-45
-        [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)]
-        [background-size:28px_28px]
-        [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_70%)]"
-      />
-
-      <div
-        aria-hidden
-        className="absolute -top-44 -left-40 -z-10 h-[520px] w-[520px] blur-[2px]
-        bg-[radial-gradient(circle_at_30%_30%,rgba(88,197,255,0.30),transparent_60%)]"
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-56 -right-48 -z-10 h-[560px] w-[560px] blur-[2px]
-        bg-[radial-gradient(circle_at_60%_60%,rgba(45,110,255,0.26),transparent_62%)]"
-      />
-
-      <main className="relative px-12 py-6">
+    <div className="min-h-[calc(100vh-4rem)] bg-white">
+      <main className="px-12 py-6">
         <div className="mb-6 flex items-center justify-between pt-10">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-extrabold tracking-tight text-white/95">
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
                 Unified Control Tower
               </h1>
-              <div className="inline-flex items-center gap-2 rounded-xl border border-orange-400/30 bg-orange-500/10 px-3 py-1.5 backdrop-blur-xl">
-                <Shield className="h-4 w-4 text-orange-400" />
-                <span className="text-xs font-bold tracking-wide text-orange-300">
+              <div className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-3 py-1.5">
+                <Shield className="h-4 w-4 text-orange-500" />
+                <span className="text-xs font-bold tracking-wide text-orange-600">
                   ADMIN
                 </span>
               </div>
             </div>
-            <p className="text-white/65 mt-1.5 text-sm">หอควบคุมศูนย์กลาง - ภาพรวม TISCO Group</p>
+            <p className="text-slate-600 mt-1.5 text-sm">หอควบคุมศูนย์กลาง - ภาพรวม TISCO Group</p>
           </div>
           <div className="text-right">
-            <div className="text-xs text-white/50">Last Updated</div>
-            <div className="text-sm font-semibold text-white/80">Feb 10, 2026 - 10:45 AM</div>
+            <div className="text-xs text-slate-500">Last Updated</div>
+            <div className="text-sm font-semibold text-slate-700">Feb 10, 2026 - 10:45 AM</div>
           </div>
         </div>
 
 
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-white/90 mb-3">Global Status</h2>
+          <h2 className="text-lg font-bold text-slate-800 mb-3">Global Status</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Total Members</p>
-                  <p className="text-2xl font-extrabold text-white/95 mt-1">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Members</p>
+                  <p className="text-2xl font-extrabold text-slate-900 mt-1">
                     {formatNumber(globalStats.totalMembers)}
                   </p>
                   <p className="text-xs text-emerald-300 mt-1.5 font-medium">
                     Active {globalStats.activePercentage}%
                   </p>
                 </div>
-                <div className="rounded-2xl bg-purple-500/20 p-3 ring-1 ring-purple-400/30">
-                  <Users className="w-7 h-7 text-purple-300" />
-                </div>
+                <Users className="w-7 h-7 text-blue-500 shrink-0" />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Total Points Value</p>
-                  <p className="text-2xl font-extrabold text-white/95 mt-1">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Points Value</p>
+                  <p className="text-2xl font-extrabold text-slate-900 mt-1">
                     ฿{formatNumber(globalStats.totalPointsValue)}
                   </p>
-                  <p className="text-xs text-white/50 mt-1.5 font-medium">Liability</p>
+                  <p className="text-xs text-slate-500 mt-1.5 font-medium">Liability</p>
                 </div>
-                <div className="rounded-2xl bg-yellow-500/20 p-3 ring-1 ring-yellow-400/30">
-                  <Coins className="w-7 h-7 text-yellow-300" />
-                </div>
+                <Coins className="w-7 h-7 text-blue-500 shrink-0" />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Today's Transactions</p>
-                  <p className="text-2xl font-extrabold text-white/95 mt-1">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Today's Transactions</p>
+                  <p className="text-2xl font-extrabold text-slate-900 mt-1">
                     {formatNumber(globalStats.todayTransactions.total)}
                   </p>
-                  <p className="text-xs text-white/50 mt-1.5 font-medium">รายการทั้งหมด</p>
+                  <p className="text-xs text-slate-500 mt-1.5 font-medium">รายการทั้งหมด</p>
                 </div>
-                <div className="rounded-2xl bg-green-500/20 p-3 ring-1 ring-green-400/30">
-                  <TrendingUp className="w-7 h-7 text-green-300" />
-                </div>
+                <TrendingUp className="w-7 h-7 text-blue-500 shrink-0" />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Earn / Burn</p>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Earn / Burn</p>
                   <div className="flex gap-3 items-center mt-1">
                     <span className="text-lg font-extrabold text-emerald-300">
                       ↓{formatNumber(globalStats.todayTransactions.earn)}
@@ -323,46 +292,44 @@ export default function DashboardPage() {
                       ↑{formatNumber(globalStats.todayTransactions.burn)}
                     </span>
                   </div>
-                  <p className="text-xs text-white/50 mt-1.5 font-medium">Today</p>
+                  <p className="text-xs text-slate-500 mt-1.5 font-medium">Today</p>
                 </div>
-                <div className="rounded-2xl bg-sky-500/20 p-3 ring-1 ring-sky-400/30">
-                  <RefreshCw className="w-7 h-7 text-sky-300" />
-                </div>
+                <RefreshCw className="w-7 h-7 text-blue-500 shrink-0" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-white/90 mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-orange-400" />
+          <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-orange-500" />
             Critical Inventory Alert
           </h2>
-          <div className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="border-b border-white/10">
+                <thead className="border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Company
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Reward Item
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Action
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-200">
                   {inventoryAlerts.map((item, index) => {
                     const colors = getColorClasses(item.color);
                     const isLowStock = item.status === "warning";
                     return (
-                      <tr key={index} className={isLowStock ? "bg-orange-500/5" : ""}>
+                      <tr key={index} className={isLowStock ? "bg-orange-500/10" : ""}>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <div className={`w-1 h-10 ${colors.bg} rounded`}></div>
@@ -372,20 +339,20 @@ export default function DashboardPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="text-sm text-white/85">{item.rewardItem}</div>
+                          <div className="text-sm text-slate-700">{item.rewardItem}</div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           {isLowStock ? (
                             <div className="flex items-center gap-2">
-                              <AlertTriangle className="w-4 h-4 text-orange-400" />
-                              <span className="text-sm font-medium text-orange-300">
+                              <AlertTriangle className="w-4 h-4 text-orange-500" />
+                              <span className="text-sm font-semibold text-orange-600">
                                 Left: {item.current} / {item.total}
                               </span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                              <span className="text-sm text-white/60">
+                              <span className="text-sm text-slate-500">
                                 Left: {item.current} / {item.total}
                               </span>
                             </div>
@@ -393,11 +360,11 @@ export default function DashboardPage() {
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           {isLowStock ? (
-                            <button className="rounded-xl border border-white/15 bg-sky-500/20 hover:bg-sky-500/30 px-4 py-2 text-xs font-bold text-sky-200 transition-colors ring-1 ring-sky-400/20">
+                            <button className="rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 px-4 py-2 text-xs font-bold text-slate-600 transition-colors">
                               Restock
                             </button>
                           ) : (
-                            <span className="text-white/30 text-sm">-</span>
+                            <span className="text-slate-400 text-sm">-</span>
                           )}
                         </td>
                       </tr>
@@ -411,21 +378,21 @@ export default function DashboardPage() {
 
         {/* Analytics Section */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-white/90 mb-3">Analytics Overview</h2>
+          <h2 className="text-lg font-bold text-slate-800 mb-3">Analytics Overview</h2>
           
           {/* Donut Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Member Tier Distribution */}
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-md font-bold text-white/90">Member Tier Distribution</h3>
+                <h3 className="text-md font-bold text-slate-800">Member Tier Distribution</h3>
                 <div className="flex gap-2">
                   <button
                     onClick={() => { setTierFilter("All"); setAnimationKey(prev => prev + 1); }}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       tierFilter === "All"
-                        ? "bg-white/15 text-white border border-white/20"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        ? "bg-slate-200 text-slate-900 border border-slate-300"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     All
@@ -435,7 +402,7 @@ export default function DashboardPage() {
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       tierFilter === "TISCO"
                         ? "bg-red-500/20 text-red-300 border border-red-400/30"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     TISCO
@@ -445,7 +412,7 @@ export default function DashboardPage() {
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       tierFilter === "Bank"
                         ? "bg-blue-500/20 text-blue-300 border border-blue-400/30"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     Bank
@@ -455,7 +422,7 @@ export default function DashboardPage() {
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       tierFilter === "Insure"
                         ? "bg-green-500/20 text-green-300 border border-green-400/30"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     Insure
@@ -481,11 +448,10 @@ export default function DashboardPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "12px",
-                      backdropFilter: "blur(12px)",
-                      color: "white",
+                      color: "#334155",
                     }}
                     formatter={(value: number | undefined) => value ? formatNumber(value) : ''}
                   />
@@ -494,22 +460,22 @@ export default function DashboardPage() {
               <div className="flex justify-center gap-4 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-purple-400"></div>
-                  <span className="text-xs text-white/70">Platinum</span>
+                  <span className="text-xs text-slate-600">Platinum</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <span className="text-xs text-white/70">Gold</span>
+                  <span className="text-xs text-slate-600">Gold</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-slate-400"></div>
-                  <span className="text-xs text-white/70">Silver</span>
+                  <span className="text-xs text-slate-600">Silver</span>
                 </div>
               </div>
             </div>
 
             {/* Point Liability */}
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <h3 className="text-md font-bold text-white/90 mb-4">Point Liability (Outstanding)</h3>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+              <h3 className="text-md font-bold text-slate-800 mb-4">Point Liability (Outstanding)</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart key="point-liability">
                   <Pie
@@ -529,11 +495,10 @@ export default function DashboardPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "12px",
-                      backdropFilter: "blur(12px)",
-                      color: "white",
+                      color: "#334155",
                     }}
                     formatter={(value: number | undefined) => value ? `฿${formatNumber(value)}` : ''}
                   />
@@ -542,15 +507,15 @@ export default function DashboardPage() {
               <div className="flex justify-center gap-4 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span className="text-xs text-white/70">TISCO</span>
+                  <span className="text-xs text-slate-600">TISCO</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                  <span className="text-xs text-white/70">Bank</span>
+                  <span className="text-xs text-slate-600">Bank</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span className="text-xs text-white/70">Insure</span>
+                  <span className="text-xs text-slate-600">Insure</span>
                 </div>
               </div>
             </div>
@@ -559,16 +524,16 @@ export default function DashboardPage() {
           {/* Bar Charts Section */}
           <div className="grid grid-cols-1 gap-6 mb-6">
             {/* Monthly Earn vs Burn */}
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-md font-bold text-white/90">Monthly Earn vs Burn</h3>
+                <h3 className="text-md font-bold text-slate-800">Monthly Earn vs Burn</h3>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setChartTimeRange("3M")}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       chartTimeRange === "3M"
-                        ? "bg-white/15 text-white border border-white/20"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        ? "bg-slate-200 text-slate-900 border border-slate-300"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     3M
@@ -577,8 +542,8 @@ export default function DashboardPage() {
                     onClick={() => setChartTimeRange("6M")}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       chartTimeRange === "6M"
-                        ? "bg-white/15 text-white border border-white/20"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        ? "bg-slate-200 text-slate-900 border border-slate-300"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     6M
@@ -587,8 +552,8 @@ export default function DashboardPage() {
                     onClick={() => setChartTimeRange("1Y")}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
                       chartTimeRange === "1Y"
-                        ? "bg-white/15 text-white border border-white/20"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                        ? "bg-slate-200 text-slate-900 border border-slate-300"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
                     }`}
                   >
                     1Y
@@ -597,20 +562,19 @@ export default function DashboardPage() {
               </div>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={monthlyEarnBurnData.slice(chartTimeRange === "3M" ? -3 : chartTimeRange === "6M" ? -6 : 0)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="month" stroke="rgba(255,255,255,0.7)" />
-                  <YAxis stroke="rgba(255,255,255,0.7)" tickFormatter={(value) => formatNumber(value)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
+                  <XAxis dataKey="month" stroke="#64748b" />
+                  <YAxis stroke="#64748b" tickFormatter={(value) => formatNumber(value)} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "12px",
-                      backdropFilter: "blur(12px)",
-                      color: "white",
+                      color: "#334155",
                     }}
                     formatter={(value: number | undefined) => value ? formatNumber(value) : ''}
                   />
-                  <Legend wrapperStyle={{ color: "white" }} />
+                  <Legend wrapperStyle={{ color: "#334155" }} />
                   <Bar dataKey="earn" fill="#22c55e" name="Points Earned" radius={[8, 8, 0, 0]} />
                   <Bar dataKey="burn" fill="#f97316" name="Points Burned" radius={[8, 8, 0, 0]} />
                 </BarChart>
@@ -620,20 +584,19 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Top 5 Redemptions */}
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <h3 className="text-md font-bold text-white/90 mb-4">Top 5 Redemption Campaigns</h3>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+              <h3 className="text-md font-bold text-slate-800 mb-4">Top 5 Redemption Campaigns</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={topRedemptionsData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis type="number" stroke="rgba(255,255,255,0.7)" tickFormatter={(value) => formatNumber(value)} />
-                  <YAxis type="category" dataKey="name" stroke="rgba(255,255,255,0.7)" width={120} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
+                  <XAxis type="number" stroke="#64748b" tickFormatter={(value) => formatNumber(value)} />
+                  <YAxis type="category" dataKey="name" stroke="#64748b" width={120} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "12px",
-                      backdropFilter: "blur(12px)",
-                      color: "white",
+                      color: "#334155",
                     }}
                   />
                   <Bar dataKey="count" fill="#3b82f6" radius={[0, 8, 8, 0]} />
@@ -642,20 +605,19 @@ export default function DashboardPage() {
             </div>
 
             {/* Points by Activity */}
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <h3 className="text-md font-bold text-white/90 mb-4">Points Earned by Activity</h3>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+              <h3 className="text-md font-bold text-slate-800 mb-4">Points Earned by Activity</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={pointsByActivityData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="activity" stroke="rgba(255,255,255,0.7)" />
-                  <YAxis stroke="rgba(255,255,255,0.7)" tickFormatter={(value) => formatNumber(value)} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
+                  <XAxis dataKey="activity" stroke="#64748b" />
+                  <YAxis stroke="#64748b" tickFormatter={(value) => formatNumber(value)} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      backgroundColor: "white",
+                      border: "1px solid #e2e8f0",
                       borderRadius: "12px",
-                      backdropFilter: "blur(12px)",
-                      color: "white",
+                      color: "#334155",
                     }}
                     formatter={(value: number | undefined) => value ? formatNumber(value) : ''}
                   />
@@ -666,24 +628,23 @@ export default function DashboardPage() {
           </div>
 
           {/* Stacked Bar Chart */}
-          <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]">
-            <h3 className="text-md font-bold text-white/90 mb-4">Monthly Transaction by Company (Stacked)</h3>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+            <h3 className="text-md font-bold text-slate-800 mb-4">Monthly Transaction by Company (Stacked)</h3>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={stackedMonthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="month" stroke="rgba(255,255,255,0.7)" />
-                <YAxis stroke="rgba(255,255,255,0.7)" tickFormatter={(value) => formatNumber(value)} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" />
+                <XAxis dataKey="month" stroke="#64748b" />
+                <YAxis stroke="#64748b" tickFormatter={(value) => formatNumber(value)} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    backgroundColor: "white",
+                    border: "1px solid #e2e8f0",
                     borderRadius: "12px",
-                    backdropFilter: "blur(12px)",
-                    color: "white",
+                    color: "#334155",
                   }}
                   formatter={(value: number | undefined) => value ? formatNumber(value) : ''}
                 />
-                <Legend wrapperStyle={{ color: "white" }} />
+                <Legend wrapperStyle={{ color: "#334155" }} />
                 <Bar dataKey="TISCO" stackId="a" fill="#ef4444" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="Bank" stackId="a" fill="#3b82f6" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="Insure" stackId="a" fill="#22c55e" radius={[8, 8, 0, 0]} />
@@ -693,15 +654,15 @@ export default function DashboardPage() {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-white/90 mb-3">Campaign Performance Feed</h2>
+          <h2 className="text-lg font-bold text-slate-800 mb-3">Campaign Performance Feed</h2>
           
           <div className="flex gap-2 mb-4">
             <button
               onClick={() => setCampaignFilter("All")}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
                 campaignFilter === "All"
-                  ? "bg-white/15 text-white border border-white/20"
-                  : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                  ? "bg-slate-200 text-slate-900 border border-slate-300"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               All
@@ -711,7 +672,7 @@ export default function DashboardPage() {
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${
                 campaignFilter === "TISCO"
                   ? "bg-red-500/20 text-red-300 border border-red-400/30 ring-1 ring-red-500/20"
-                  : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               <div className="w-2 h-2 bg-red-400 rounded-full"></div>
@@ -722,7 +683,7 @@ export default function DashboardPage() {
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${
                 campaignFilter === "Bank"
                   ? "bg-blue-500/20 text-blue-300 border border-blue-400/30 ring-1 ring-blue-500/20"
-                  : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -733,7 +694,7 @@ export default function DashboardPage() {
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${
                 campaignFilter === "Insure"
                   ? "bg-green-500/20 text-green-300 border border-green-400/30 ring-1 ring-green-500/20"
-                  : "bg-white/5 text-white/70 hover:bg-white/10 border border-white/10"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -742,32 +703,32 @@ export default function DashboardPage() {
           </div>
 
 
-          <div className="rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="border-b border-white/10">
+                <thead className="border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Campaign
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Participants
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Points Earned
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Points Used
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Rewards Used
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-white/70 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">
                       Privileges Used
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-200">
                   {filteredCampaigns.map((campaign, index) => {
                     const colors = getColorClasses(campaign.color);
                     return (
@@ -781,7 +742,7 @@ export default function DashboardPage() {
                                   [{campaign.company}]
                                 </span>
                               </div>
-                              <div className="text-sm font-bold text-white/95">
+                              <div className="text-sm font-bold text-slate-900">
                                 {campaign.name}
                               </div>
                             </div>
@@ -789,40 +750,40 @@ export default function DashboardPage() {
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-purple-300" />
-                            <span className="text-sm font-bold text-purple-200">
+                            <Users className="w-4 h-4 text-slate-500" />
+                            <span className="text-sm font-bold text-slate-600">
                               {campaign.participants}
                             </span>
                           </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <TrendingDown className="w-4 h-4 text-green-300" />
-                            <span className="text-sm font-bold text-green-200">
+                            <TrendingUp className="w-4 h-4 text-slate-500" />
+                            <span className="text-sm font-bold text-slate-600">
                               {formatNumber(campaign.pointsEarned)}
                             </span>
                           </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-orange-300" />
-                            <span className="text-sm font-bold text-orange-200">
+                            <TrendingDown className="w-4 h-4 text-slate-500" />
+                            <span className="text-sm font-bold text-slate-600">
                               {formatNumber(campaign.pointsUsed)}
                             </span>
                           </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <Gift className="w-4 h-4 text-blue-300" />
-                            <span className="text-sm font-bold text-blue-200">
+                            <Gift className="w-4 h-4 text-slate-500" />
+                            <span className="text-sm font-bold text-slate-600">
                               {campaign.rewardsUsed}
                             </span>
                           </div>
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <Star className="w-4 h-4 text-yellow-300" />
-                            <span className="text-sm font-bold text-yellow-200">
+                            <Star className="w-4 h-4 text-slate-500" />
+                            <span className="text-sm font-bold text-slate-600">
                               {campaign.privilegesUsed}
                             </span>
                           </div>
