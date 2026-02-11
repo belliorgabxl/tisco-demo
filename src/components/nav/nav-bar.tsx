@@ -5,7 +5,6 @@ import {
   Wallet,
   Receipt,
   UserRound,
-  QrCode,
   ScanQrCode,
 } from "lucide-react";
 import { NavItem } from "./nav-items";
@@ -39,11 +38,10 @@ export default function Navbar({
             onClick={() => onChange("wallet")}
           />
 
-          {/* Center QR button (bigger & different) */}
           <div className="relative flex items-center justify-center">
             <button
               type="button"
-              onClick={() => onChange("qr" as NavKey)}
+              onClick={() => onChange("myqr")}
               className="group -mt-2 h-14 w-14 rounded-full
                 bg-white text-gray-900
                 shadow-[0_18px_38px_rgba(45,110,255,0.22),0_8px_18px_rgba(88,197,255,0.12)]

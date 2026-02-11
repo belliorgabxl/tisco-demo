@@ -25,6 +25,8 @@ function navKeyToPath(key: NavKey): string {
       return "/main/history";
     case "profile":
       return "/main/profile";
+    case "myqr":
+      return "/main/myqr";
     default:
       return "/main/home";
   }

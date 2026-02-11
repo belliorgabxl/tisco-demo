@@ -41,7 +41,7 @@ export default function HomePage() {
       },
       {
         icon: <Component className="h-5 w-5 text-blue-900" />,
-        title: "My Coupon",
+        title: "Coupons",
         subtitle: "คูปองของฉัน",
         link: "/main/mycoupon",
       },
