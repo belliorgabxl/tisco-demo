@@ -139,6 +139,30 @@ export default function MyCouponPage() {
     return s;
   }, [items]);
 
+  async function openCoupon(it: MyCouponItem) {
+    try {
+      if (it.status === "saved") {
+        const res = await fetch(
+          `/api/mycoupon/${encodeURIComponent(it._id)}/activate`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { Accept: "application/json" },
+          },
+        );
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json?.success === false) {
+          throw new Error(json?.message || `Activate failed (${res.status})`);
+        }
+
+        await load();
+      }
+
+      window.location.href = `/main/mycoupon/${it._id}`;
+    } catch (e: any) {
+      setError(e?.message ?? "Activate failed");
+    }
+  }
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
       {/* bg */}
@@ -255,9 +279,10 @@ export default function MyCouponPage() {
               {filtered.map((it) => {
                 const st = statusLabel(it.status);
                 return (
-                  <Link
+                  <button
                     key={it._id}
-                    href={`/main/mycoupon/${it._id}`}
+                    // href={`/main/mycoupon/${it._id}`}
+                    onClick={() => openCoupon(it)}
                     className="group overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
                       shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
                       hover:bg-white/15 active:scale-[0.995] transition"
@@ -314,7 +339,7 @@ export default function MyCouponPage() {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </button>
                 );
               })}
             </div>

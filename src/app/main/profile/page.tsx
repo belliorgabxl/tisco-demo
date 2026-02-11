@@ -150,7 +150,7 @@ export default function MePage() {
         <div className="mt-4 relative z-50">
           <UserBanner
             meEndpoint="/api/auth/me"
-            onRedeem={() => router.push("/rewards")}
+            // onRedeem={() => router.push("/rewards")}
             onOpenNotifications={() => router.push("/me/notifications")}
             onAccountChange={(next) => {
               setActivePointType(next);

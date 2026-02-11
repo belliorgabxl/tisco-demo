@@ -128,7 +128,7 @@ export default function HomePage() {
         <div className="relative z-50">
           <UserBanner
             meEndpoint="/api/auth/me"
-            onRedeem={() => console.log("redeem")}
+            // onRedeem={() => console.log("redeem")}
             onOpenNotifications={() => console.log("open notifications")}
             onAccountChange={(next) => {
               setActivePointType(next);

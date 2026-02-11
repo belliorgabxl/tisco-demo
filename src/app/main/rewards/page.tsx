@@ -10,9 +10,14 @@ import Link from "next/link";
 import { REWARDS } from "@/resource/reward";
 import ThemeBackground from "@/components/theme-background";
 
+type MyCouponLite = { rewardId?: string | number };
+
 export default function RewardPage() {
   const router = useRouter();
   const [activePointType, setActivePointType] = useState<PointType>("TISCO");
+
+  const [ownedRewardIds, setOwnedRewardIds] = useState<Set<string>>(new Set());
+  const [ownedLoading, setOwnedLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -30,36 +35,71 @@ export default function RewardPage() {
     }
   }, []);
 
-  const rewardCards = useMemo(() => {
-    const order = [
-      "free-coupon",
-      "tisco-100-points",
-      "coupon-10-points",
-      "insurance-benefits",
-      "wealth-lounge",
-    ] as const;
+  useEffect(() => {
+    (async () => {
+      try {
+        setOwnedLoading(true);
+        const res = await fetch("/api/mycoupon", {
+          method: "GET",
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        const json = await res.json().catch(() => ({}));
 
-    return order.map((id) => {
-      const r = REWARDS[id];
+        if (!res.ok || json?.success === false) {
+          setOwnedRewardIds(new Set());
+          return;
+        }
+
+        const arr: MyCouponLite[] = Array.isArray(json?.data) ? json.data : [];
+        const s = new Set<string>();
+
+        for (const it of arr) {
+          const rid = it?.rewardId;
+          if (rid !== undefined && rid !== null) s.add(String(rid));
+        }
+
+        setOwnedRewardIds(s);
+      } finally {
+        setOwnedLoading(false);
+      }
+    })();
+  }, []);
+  const rewardCards = useMemo(() => {
+    const all = Object.entries(REWARDS).map(([rewardKey, r]) => {
+      const cost = Number(r?.pointAction?.amount ?? r?.points ?? 0);
+      const pt = String(
+        r?.pointAction?.pointType ?? "TISCO",
+      ).toUpperCase() as PointType;
+
       return {
-        id: r.id,
+        key: rewardKey,
+        id: String(r.id),
         title: r.title,
         desc: r.desc,
         image: r.image,
         badge: r.badge,
+        pointType: pt,
+        cost,
         href: `/main/rewards/${r.id}`,
       };
     });
-  }, []);
+
+    const notOwned = all.filter((x) => !ownedRewardIds.has(String(x.id)));
+
+    const same = notOwned.filter((x) => x.pointType === activePointType);
+
+    return [...same];
+  }, [activePointType, ownedRewardIds]);
 
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
-      <ThemeBackground type={activePointType} /> 
+      <ThemeBackground type={activePointType} />
       <section className="w-full max-w-[520px] relative pb-28">
         <div className="relative z-50">
           <UserBanner
             meEndpoint="/api/auth/me"
-            onRedeem={() => console.log("redeem")}
+            // onRedeem={() => console.log("redeem")}
             onOpenNotifications={() => console.log("open notifications")}
             onAccountChange={(next) => {
               setActivePointType(next);
@@ -73,13 +113,13 @@ export default function RewardPage() {
           <div className="text-sm font-bold text-white/90">
             Rewards & Privileges
           </div>
-          <button
+          {/* <button
             type="button"
             onClick={() => router.push("/rewards")}
             className="inline-flex items-center gap-1 text-xs font-semibold text-sky-200 hover:text-sky-100"
           >
             See all <ChevronRight className="h-4 w-4" />
-          </button>
+          </button> */}
         </div>
 
         <div className="mt-3 z-0  grid grid-cols-2 gap-3">
@@ -87,7 +127,7 @@ export default function RewardPage() {
             <Link
               key={c.id}
               href={c.href}
-              className="group overflow-hidden rounded-3xl border border-white/15 bg-white/10 text-left backdrop-blur-xl
+              className="group overflow-hidden rounded-xl border border-white/15 bg-white/10 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
               hover:bg-white/15 active:scale-[0.995] transition"
             >
@@ -102,12 +142,14 @@ export default function RewardPage() {
               </div>
 
               <div className="p-4">
-                <p className="text-xs text-white/60">{c.desc}</p>
+                <p className="text-xs text-white/60 line-clamp-3">{c.desc}</p>
                 <div className="mt-2 grid gap-2 text-white/70">
-                  <p className="text-sm text-white font-semibold">{c.title}</p>
+                  <p className="text-sm text-white font-semibold line-clamp-2">
+                    {c.title}
+                  </p>
 
-                  <div className="inline-flex items-center justify-center gap animate-pulse rounded-3xl bg-white px-2 py-1 text-sm font-semibold text-blue-950">
-                    Redeem
+                  <div className="inline-flex items-center text-sm justify-center gap-2 rounded-3xl bg-white px-2 py-1  font-semibold text-blue-950">
+                    {c.cost <= 0 ? "Free" : `${c.cost}  Point`}
                     <ChevronRight className="h-5 w-5 transition group-hover:translate-x-2" />
                   </div>
                 </div>
@@ -173,7 +215,7 @@ export default function RewardPage() {
             <Link
               key={m.title}
               href={m.href}
-              className="rounded-3xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl
+              className="rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl
                 shadow-[0_14px_30px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.06)]
                 hover:bg-white/15 active:scale-[0.99] transition"
             >

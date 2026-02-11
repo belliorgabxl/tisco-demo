@@ -210,7 +210,7 @@ export default function WalletPage() {
           <button
             type="button"
             onClick={() => console.log("topup")}
-            className="group rounded-3xl border border-white/15 bg-white/10 p-4 text-left backdrop-blur-xl
+            className="group rounded-3xl border border-white/15 bg-white/10 px-4 py-4 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
               hover:bg-white/15 active:scale-[0.995] flex justify-start gap-2 items-start transition"
           >
@@ -219,9 +219,7 @@ export default function WalletPage() {
             </div>
             <div className="">
               <p className=" text-sm font-extrabold text-white/90">Top up</p>
-              <p className="mt-1 text-xs text-white/60">
-                เพิ่มแต้ม / เติมเครดิต
-              </p>
+              <p className="mt-1 text-xs text-white/60">เติมเครดิต</p>
             </div>
           </button>
 
@@ -229,15 +227,15 @@ export default function WalletPage() {
             href={"/main/transfer-point"}
             type="button"
             onClick={() => console.log("transfer")}
-            className="group rounded-3xl border border-white/15 bg-white/10 p-4 text-left backdrop-blur-xl
+            className="group rounded-3xl border border-blue-300/80 bg-white/10 px-2 py-4 text-left backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]
               hover:bg-white/15 active:scale-[0.995] transition flex gap-2  justify-start items-start"
           >
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
+            {/* <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
               <ArrowUpRight className="h-5 w-5 text-sky-200" />
-            </div>
+            </div> */}
 
-            <div>
+            <div className="w-full grid place-items-center">
               <p className=" text-sm font-extrabold text-white/90">
                 Transfer-Point
               </p>

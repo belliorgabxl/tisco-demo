@@ -41,6 +41,8 @@ export default function RegisterPage() {
     passportNumber: "",
 
     consentAccepted: false,
+    consentAccepted1: false,
+    consentAccepted2: false,
     policyVersion: "v1",
   });
   const [openPolicy, setOpenPolicy] = useState(false);
@@ -59,6 +61,8 @@ export default function RegisterPage() {
       form.email.trim().length > 0 &&
       form.dateOfBirth.trim().length > 0 &&
       form.consentAccepted;
+    form.consentAccepted1;
+    form.consentAccepted2;
 
     const idOk =
       form.nationalId.trim() !== "" || form.passportNumber.trim() !== "";
@@ -95,6 +99,8 @@ export default function RegisterPage() {
         ...prev,
         password: "",
         consentAccepted: false,
+        consentAccepted1: false,
+        consentAccepted2: false,
       }));
       setTimeout(() => router.push("/"), 600);
     } catch {
@@ -133,9 +139,7 @@ export default function RegisterPage() {
       <section className="w-full max-w-105 relative min-h-screen flex flex-col pt-2">
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <div>
-            
-          </div>
+          <div></div>
           {/* <a
             href="/"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
@@ -395,7 +399,6 @@ export default function RegisterPage() {
               <div className="text-sm font-extrabold text-white/90">
                 การยินยอม
               </div>
-
               <div className="mt-3 flex items-start gap-3">
                 <input
                   type="checkbox"
@@ -418,10 +421,45 @@ export default function RegisterPage() {
                     Privacy Policy / Terms
                   </button>
                   แล้ว
-                  <div className="mt-1 text-[12px] text-white/45">
-                    (เวอร์ชันนโยบาย: {form.policyVersion})
-                  </div>
                 </div>
+              </div>
+              <div className="mt-3 flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-5 w-5 rounded border-white/20 bg-white/10 accent-sky-400"
+                  checked={form.consentAccepted1}
+                  onChange={(e) =>
+                    setForm((p) => ({
+                      ...p,
+                      consentAccepted1: e.target.checked,
+                    }))
+                  }
+                />
+
+                <div className="text-sm text-white/75 leading-relaxed flex gap-2">
+                  ยินยอมให้ใช้ข้อมูลในการสมัครสมาชิก
+                  <p className="text-indigo-300 text-semibold"> TInsure</p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-5 w-5 rounded border-white/20 bg-white/10 accent-sky-400"
+                  checked={form.consentAccepted2}
+                  onChange={(e) =>
+                    setForm((p) => ({
+                      ...p,
+                      consentAccepted2: e.target.checked,
+                    }))
+                  }
+                />
+                <div className="text-sm text-white/75 leading-relaxed flex gap-2">
+                  ยินยอมให้ใช้ข้อมูลในการสมัครสมาชิก
+                  <p className="text-green-300 text-semibold"> TWealth</p>
+                </div>
+              </div>{" "}
+              <div className="mt-3 text-center text-[12px] text-white/45">
+                (เวอร์ชันนโยบาย: {form.policyVersion})
               </div>
             </div>
 
@@ -443,12 +481,7 @@ export default function RegisterPage() {
                   กำลังสมัครสมาชิก...
                 </span>
               ) : (
-                <>
-                  สมัครสมาชิก
-                  <span className="ml-2 text-lg opacity-90 transition group-hover:translate-x-0.5">
-                    <ArrowRight className="text-white h-5 w-5" />
-                  </span>
-                </>
+                <>สมัครสมาชิก</>
               )}
             </button>
 

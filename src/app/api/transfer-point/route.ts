@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 import { connectDB } from "@/libs/database";
 import { verifyToken } from "@/libs/auth";
 import { Credit } from "@/models/Credit";
 import { History, HistoryStatus, HistoryType } from "@/models/History";
 
-type PointType = "TISCO" | "TWEALTH" | "TINSURE";
+type InternalPointType = "TISCO" | "TWEALTH" | "TINSURE";
+type PointType = InternalPointType | "JPOINT";
 
 const TransferSchema = z
   .object({
-    fromPointType: z.enum(["TISCO", "TWEALTH", "TINSURE"]),
-    toPointType: z.enum(["TISCO", "TWEALTH", "TINSURE"]),
+    fromPointType: z.enum(["TISCO", "TWEALTH", "TINSURE"]), // ✅ from ห้ามเป็น JPOINT
+    toPointType: z.enum(["TISCO", "TWEALTH", "TINSURE", "JPOINT"]), // ✅ to เป็น JPOINT ได้
     amount: z.number().int().positive(),
     description: z.string().optional(),
     metadata: z.any().optional(),
@@ -30,7 +32,7 @@ function getAuthToken(req: Request) {
   );
 }
 
-function pointField(pointType: PointType) {
+function pointField(pointType: InternalPointType) {
   if (pointType === "TISCO") return "tiscoPoint";
   if (pointType === "TWEALTH") return "twealthPoint";
   return "tinsurePoint";
@@ -97,7 +99,7 @@ export async function POST(req: Request) {
   } = parsed.data;
 
   const fromField = pointField(fromPointType);
-  const toField = pointField(toPointType);
+  const isExternalToJPoint = toPointType === "JPOINT";
 
   const ipAddress =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -121,22 +123,29 @@ export async function POST(req: Request) {
       { upsert: true },
     );
 
-    // ✅ atomic transfer: ต้องมี from >= amount
-    const updated = await Credit.findOneAndUpdate(
-      { userId, [fromField]: { $gte: amount } },
-      {
-        $inc: {
-          [fromField]: -amount,
-          [toField]: amount,
-          // totalPoints ไม่เปลี่ยน เพราะเป็นแค่ transfer ภายใน
-        },
-      },
-      { new: true },
-    );
+    let updated: any = null;
+
+    if (isExternalToJPoint) {
+      // ✅ OUTBOUND to JPOINT: หักแต้มฝั่งเราอย่างเดียว + totalPoints ลดลง
+      updated = await Credit.findOneAndUpdate(
+        { userId, [fromField]: { $gte: amount } },
+        { $inc: { [fromField]: -amount, totalPoints: -amount } },
+        { new: true },
+      );
+    } else {
+      // ✅ INTERNAL transfer: หักจาก from + บวกเข้า to (totalPoints ไม่เปลี่ยน)
+      const toField = pointField(toPointType as InternalPointType);
+
+      updated = await Credit.findOneAndUpdate(
+        { userId, [fromField]: { $gte: amount } },
+        { $inc: { [fromField]: -amount, [toField]: amount } },
+        { new: true },
+      );
+    }
 
     if (!updated) {
       const current = await Credit.findOne({ userId });
-      // บันทึก history แบบ FAILED (ใช้ type เดิมเพื่อไม่ชน enum)
+
       await History.create({
         userId: new mongoose.Types.ObjectId(userId),
         type: HistoryType.POINT_SPEND,
@@ -146,7 +155,7 @@ export async function POST(req: Request) {
         description: description ?? "Insufficient balance",
         metadata: {
           ...(metadata ?? {}),
-          action: "transfer",
+          action: isExternalToJPoint ? "transfer_out" : "transfer",
           fromPointType,
           toPointType,
           reason: "insufficient_balance",
@@ -162,20 +171,21 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ history 2 รายการ (ใช้ enum เดิม ปลอดภัยสุด)
+    // ✅ history
     const transferId = crypto.randomUUID();
 
-    await History.create([
-      {
+    if (isExternalToJPoint) {
+      // โอนไปข้างนอก: บันทึกฝั่ง spend อันเดียวพอ
+      await History.create({
         userId: new mongoose.Types.ObjectId(userId),
         type: HistoryType.POINT_SPEND,
         status: HistoryStatus.SUCCESS,
         pointChange: buildPointChange(fromPointType, -amount),
         balanceAfter: buildBalanceAfter(updated),
-        description: description ?? "Point transferred (debit)",
+        description: description ?? "Point transferred to JPOINT (outbound)",
         metadata: {
           ...(metadata ?? {}),
-          action: "transfer",
+          action: "transfer_out",
           transferId,
           fromPointType,
           toPointType,
@@ -183,30 +193,57 @@ export async function POST(req: Request) {
         transactionRef,
         ipAddress,
         userAgent,
-      },
-      {
-        userId: new mongoose.Types.ObjectId(userId),
-        type: HistoryType.POINT_EARN,
-        status: HistoryStatus.SUCCESS,
-        pointChange: buildPointChange(toPointType, amount),
-        balanceAfter: buildBalanceAfter(updated),
-        description: description ?? "Point transferred (credit)",
-        metadata: {
-          ...(metadata ?? {}),
-          action: "transfer",
-          transferId,
-          fromPointType,
-          toPointType,
+      });
+    } else {
+      // โอนภายใน: บันทึก 2 รายการ (spend + earn)
+      await History.create([
+        {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: HistoryType.POINT_SPEND,
+          status: HistoryStatus.SUCCESS,
+          pointChange: buildPointChange(fromPointType, -amount),
+          balanceAfter: buildBalanceAfter(updated),
+          description: description ?? "Point transferred (debit)",
+          metadata: {
+            ...(metadata ?? {}),
+            action: "transfer",
+            transferId,
+            fromPointType,
+            toPointType,
+          },
+          transactionRef,
+          ipAddress,
+          userAgent,
         },
-        transactionRef,
-        ipAddress,
-        userAgent,
-      },
-    ]);
+        {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: HistoryType.POINT_EARN,
+          status: HistoryStatus.SUCCESS,
+          pointChange: buildPointChange(
+            toPointType as InternalPointType,
+            amount,
+          ),
+          balanceAfter: buildBalanceAfter(updated),
+          description: description ?? "Point transferred (credit)",
+          metadata: {
+            ...(metadata ?? {}),
+            action: "transfer",
+            transferId,
+            fromPointType,
+            toPointType,
+          },
+          transactionRef,
+          ipAddress,
+          userAgent,
+        },
+      ]);
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Transfer success",
+      message: isExternalToJPoint
+        ? "Transfer to JPOINT success"
+        : "Transfer success",
       data: {
         tiscoPoint: updated.tiscoPoint,
         twealthPoint: updated.twealthPoint,

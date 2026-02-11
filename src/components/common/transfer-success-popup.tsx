@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { CheckCircle2, X } from "lucide-react";
 
-type PointType = "TISCO" | "TWEALTH" | "TINSURE";
+type PointType = "TISCO" | "TWEALTH" | "TINSURE" | "JPOINT";
 
 export type TransferSuccessInfo = {
   from: PointType;

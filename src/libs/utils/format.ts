@@ -78,3 +78,16 @@ export function mapMeToBalances(input: any): Balances {
 
   return DEFAULT_BALANCES;
 }
+
+export function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+export function formatRemain(ms: number) {
+  if (ms <= 0) return "หมดเวลา";
+  const totalSec = Math.floor(ms / 1000);
+  const mm = Math.floor(totalSec / 60);
+  const ss = totalSec % 60;
+
+  return `${mm}:${pad2(ss)}`;
+}

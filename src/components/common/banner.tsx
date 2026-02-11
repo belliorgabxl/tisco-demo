@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Bell, ChevronRight, Crown } from "lucide-react";
 import { formatNumber, mapMeToBanner } from "@/libs/utils/format";
 import { ACTIVE_POINT_TYPE_KEY, PointType } from "@/resource/constant";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { BannerError, BannerSkeleton } from "./loading-banner";
 import { MeResponse } from "@/resource/type";
 
@@ -37,17 +37,18 @@ const POINT_TYPES: Array<{
 
 export default function UserBanner({
   meEndpoint = "/api/auth/me",
-  onRedeem,
+  // onRedeem,
   onOpenNotifications,
   onAccountChange,
 }: {
   meEndpoint?: string;
-  onRedeem?: () => void;
+  // onRedeem?: () => void;
   onOpenNotifications?: () => void;
   onAccountChange?: (next: PointType) => void;
 }) {
   const router = useRouter();
-
+  const pathname = usePathname();
+  const hideRedeemBtn = pathname === "/main/rewards";
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
@@ -63,7 +64,12 @@ export default function UserBanner({
       const saved = sessionStorage.getItem(
         ACTIVE_POINT_TYPE_KEY,
       ) as PointType | null;
-      if (saved === "TISCO" || saved === "TINSURE" || saved === "TWEALTH" || saved==="JPOINT") {
+      if (
+        saved === "TISCO" ||
+        saved === "TINSURE" ||
+        saved === "TWEALTH" ||
+        saved === "JPOINT"
+      ) {
         setActiveType(saved);
       } else {
         sessionStorage.setItem(ACTIVE_POINT_TYPE_KEY, "TISCO");
@@ -275,7 +281,8 @@ export default function UserBanner({
               </span>
             </div>
             <div className="mt-0.5 text-xs text-white/70">
-              Member No: <span className="text-white/90">{user.memberNo}</span>
+              Member No
+              <br /> <span className="text-white/90">{user.memberNo}</span>
             </div>
           </div>
 
@@ -321,21 +328,22 @@ export default function UserBanner({
                 {formatNumber(activePoints)}
               </div>
               <div className="mt-1 text-xs text-white/70">
-                ใช้แลกของรางวัล / ส่วนลด / สิทธิ์พิเศษ
+                ใช้แลกของรางวัล <br /> ส่วนลด / สิทธิ์พิเศษ
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={onRedeem}
-              className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold 
-                bg-white text-blue-950
-                shadow-[0_18px_38px_rgba(45,110,255,0.28),0_8px_18px_rgba(88,197,255,0.14)]
-                hover:-translate-y-px active:scale-[0.98] transition"
-            >
-              Redeem
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            {!hideRedeemBtn && (
+              <button
+                type="button"
+                onClick={() => router.push("/main/rewards")}
+                className="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold 
+              bg-white text-blue-950
+              shadow-[0_18px_38px_rgba(45,110,255,0.28),0_8px_18px_rgba(88,197,255,0.14)]
+              hover:-translate-y-px active:scale-[0.98] transition"
+                    >
+                Redeem
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -344,7 +352,7 @@ export default function UserBanner({
     loading,
     error,
     me,
-    onRedeem,
+    // onRedeem,
     onOpenNotifications,
     activeType,
     openSwitch,

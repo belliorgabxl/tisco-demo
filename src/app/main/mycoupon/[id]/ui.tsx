@@ -31,7 +31,6 @@ export default function MyCouponDetailClient({ id }: { id: string }) {
 
         setData(json.data);
 
-        // QR value จะเป็น qrToken หรือ code ก็ได้
         const qrValue = String(json.data.qrToken || json.data.code || "");
         const url = await QRCode.toDataURL(qrValue, { margin: 1, width: 320 });
         if (alive) setQr(url);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import  { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,11 +10,10 @@ import {
   Sparkles,
   AlertTriangle,
   BadgeCheck,
-  CheckCircle2,
 } from "lucide-react";
 import SuccessTransferModal from "./transfer-success-popup";
 
-type PointType = "TISCO" | "TWEALTH" | "TINSURE";
+type PointType = "TISCO" | "TWEALTH" | "TINSURE" | "JPOINT";
 
 type CreditSummary = {
   tiscoPoint: number;

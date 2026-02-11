@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import QRCode from "qrcode";
 import { ChevronLeft, ShieldAlert, CheckCircle2, Clock } from "lucide-react";
+import { formatRemain } from "@/libs/utils/format";
 
 type UserCouponDetail = {
   _id: string;
@@ -32,12 +33,6 @@ type ApiResp = {
   message?: string;
 };
 
-function fmtTime(iso: string) {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" });
-}
-
 export default function MyCouponDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
@@ -47,6 +42,54 @@ export default function MyCouponDetailPage() {
   const [err, setErr] = useState<string | null>(null);
   const [item, setItem] = useState<UserCouponDetail | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
+  const [remainMs, setRemainMs] = useState<number>(0);
+  useEffect(() => {
+    if (!item?.expiresAt) return;
+
+    let timer: any;
+
+    const tick = () => {
+      const exp = new Date(item.expiresAt).getTime();
+      const ms = exp - Date.now();
+      setRemainMs(ms);
+
+      if (ms <= 0) {
+        clearInterval(timer);
+
+        setTimeout(() => {
+          load();
+        }, 400);
+      }
+    };
+
+    tick();
+    timer = setInterval(tick, 1000);
+
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item?._id, item?.expiresAt]);
+
+  const [copied, setCopied] = useState(false);
+
+  async function copyCode() {
+    if (!item?.couponCode) return;
+
+    try {
+      await navigator.clipboard.writeText(item.couponCode);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = item.couponCode;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  }
 
   async function load() {
     try {
@@ -86,11 +129,14 @@ export default function MyCouponDetailPage() {
     if (!item) return;
     try {
       setErr(null);
-      const res = await fetch(`/api/mycoupon/${encodeURIComponent(item._id)}/use`, {
-        method: "POST",
-        credentials: "include",
-        headers: { Accept: "application/json" },
-      });
+      const res = await fetch(
+        `/api/mycoupon/${encodeURIComponent(item._id)}/use`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        },
+      );
       const json = (await res.json().catch(() => null)) as ApiResp | null;
       if (!res.ok || !json?.success) {
         throw new Error(json?.message || `Use failed (${res.status})`);
@@ -109,9 +155,8 @@ export default function MyCouponDetailPage() {
 
   const canUse = useMemo(() => {
     if (!item) return false;
-    const exp = new Date(item.expiresAt).getTime();
-    return item.status === "active" && !Number.isNaN(exp) && exp > Date.now();
-  }, [item]);
+    return item.status === "active" && remainMs > 0;
+  }, [item, remainMs]);
 
   return (
     <main className="relative min-h-dvh overflow-hidden flex justify-center px-4 py-4 text-sky-50">
@@ -165,7 +210,8 @@ export default function MyCouponDetailPage() {
         {item ? (
           <>
             {/* Coupon card */}
-            <div className="mt-4 overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
+            <div
+              className="mt-4 overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]"
             >
               <div className="p-4 flex gap-3">
@@ -201,21 +247,32 @@ export default function MyCouponDetailPage() {
               </div>
 
               <div className="px-4 pb-4">
-                <div className="rounded-2xl border border-white/15 bg-white/5 p-3 text-xs text-white/70">
-                  <div className="flex items-center gap-2">
+                <div className="rounded-2xl border  border-white/15 bg-white/5 px-3 py-1 text-xs text-white/70">
+                  <div className="flex items-center justify-center gap-2">
                     <Clock className="h-4 w-4" />
-                    หมดอายุ: <span className="text-white/90 font-bold">{fmtTime(item.expiresAt)}</span>
+                    หมดอายุ :
+                    <span
+                      className={[
+                        "font-extrabold text-xl tabular-nums",
+                        remainMs > 0 ? "text-white/95" : "text-rose-200",
+                      ].join(" ")}
+                    >
+                      {formatRemain(remainMs)}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* QR */}
-            <div className="mt-4 overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
+            <div
+              className="mt-4 overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-xl
               shadow-[0_14px_30px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)]"
             >
               <div className="p-4">
-                <div className="text-sm font-extrabold text-white/90">QR Code</div>
+                <div className="text-sm font-extrabold text-white/90">
+                  QR Code
+                </div>
                 <div className="mt-1 text-xs text-white/60">
                   แสดงให้พนักงาน/ระบบสแกนเพื่อใช้งาน
                 </div>
@@ -224,7 +281,11 @@ export default function MyCouponDetailPage() {
                   <div className="relative h-[240px] w-[240px] overflow-hidden rounded-3xl bg-white p-3">
                     {qrDataUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={qrDataUrl} alt="qr" className="h-full w-full object-contain" />
+                      <img
+                        src={qrDataUrl}
+                        alt="qr"
+                        className="h-full w-full object-contain"
+                      />
                     ) : (
                       <div className="h-full w-full grid place-items-center text-gray-600 text-sm">
                         No QR data
@@ -233,29 +294,29 @@ export default function MyCouponDetailPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-white/15 bg-white/5 p-3 text-xs text-white/80">
-                  <div className="font-bold text-white/90">Code</div>
-                  <div className="mt-1 break-all">{item.couponCode || "-"}</div>
-                  <div className="mt-2 font-bold text-white/90">QR Text</div>
-                  <div className="mt-1 break-all">{item.qrText || "-"}</div>
-                </div>
-
                 <div className="mt-4">
+                  <p className="pb-2 text-center text-sm text-white/70">
+                  Coupon Code : {item?.couponCode}
+                  </p>
                   <button
                     type="button"
-                    disabled={!canUse}
-                    onClick={markUsed}
-                    className="w-full h-12 rounded-2xl font-extrabold text-sm text-gray-900
-                      bg-white hover:-translate-y-px active:scale-[0.99] transition
-                      disabled:opacity-60 disabled:cursor-not-allowed"
+                    disabled={!canUse || !item?.couponCode}
+                    onClick={copyCode}
+                    className={[
+                      "w-full h-12 rounded-2xl font-extrabold text-sm transition",
+                      canUse && item?.couponCode
+                        ? "bg-white text-gray-900 hover:-translate-y-px active:scale-[0.99]"
+                        : "bg-white/15 text-white/60 cursor-not-allowed",
+                    ].join(" ")}
                   >
-                    {canUse ? "Mark as Used (Demo)" : "Cannot use"}
+                    {canUse ? (copied ? "Copied!" : "Copy Code") : "Cannot use"}
                   </button>
 
-                  <div className="mt-2 flex items-center justify-center gap-2 text-[11px] text-white/55">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    * ปุ่มนี้เป็น demo (จริง ๆ ควรให้ฝั่งสแกนเรียก API use)
-                  </div>
+                  {canUse && item?.couponCode ? (
+                    <div className="mt-2 text-center text-[11px] text-white/55">
+                      แตะเพื่อคัดลอกโค้ดไปยังคลิปบอร์ด
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>

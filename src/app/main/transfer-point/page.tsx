@@ -41,7 +41,16 @@ const ALL_POINT_TYPES: {
     key: "TINSURE",
     title: "TInsure Point",
     desc: "แลก/โอนแต้มสำหรับสิทธิประโยชน์สายประกัน",
-    icon: <Shield className="h-5 w-5" />,
+    icon: (
+      <Image
+        src="/logo/tinsure-logo.png"
+        alt="tinsure"
+        width={20}
+        height={20}
+        className="h-10 w-10 object-contain bg-white rounded-full"
+        priority
+      />
+    ),
   },
   {
     key: "TWEALTH",
@@ -51,7 +60,7 @@ const ALL_POINT_TYPES: {
   },
   {
     key: "JPOINT",
-    title: "J-Point",
+    title: "J POINT",
     desc: "ระบบสะสมคะแนนในเครือเจมาร์ท",
     icon: (
       <Image
@@ -159,7 +168,7 @@ export default function Page() {
             </div>
 
             <h1 className="mt-3 text-2xl font-semibold tracking-tight">
-              Transfer-Point
+              Transfer Point
             </h1>
 
             <p className="mt-1 text-sm text-sky-100/75">
@@ -204,7 +213,7 @@ export default function Page() {
           <div className="rounded-2xl border border-white/12 bg-white/10 backdrop-blur-sm p-4">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-sky-100/90">
-                เลือก Point Type ที่จะโอนไป
+                เลือก Point ที่จะโอนคะแนน
               </p>
               <p className="text-xs text-sky-100/60">
                 {options.length} ตัวเลือก

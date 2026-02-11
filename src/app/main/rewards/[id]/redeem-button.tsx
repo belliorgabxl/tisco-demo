@@ -61,29 +61,33 @@ export default function RedeemConfirm({
     return json.data;
   }
 
-  async function confirm(mode: "now" | "later") {
-    setLoading(mode);
-    setError(null);
+ async function confirm(mode: "now" | "later") {
+  setLoading(mode);
+  setError(null);
 
-    try {
-      const data = await redeem(mode);
+  try {
+    const data = await redeem(mode);
+    setOpen(false);
 
-      setOpen(false);
+    const status = String(data?.status ?? "").toLowerCase(); 
+    const id = data?.userCouponId;
 
-      if (mode === "now") {
-        onUseNow?.(data);
-        router.push(`/main/mycoupon/${data.userCouponId}`);
-        return;
-      }
 
-      onUseLater?.(data);
-      router.push("/main/mycoupon");
-    } catch (e: any) {
-      setError(e?.message ?? "Something went wrong");
-    } finally {
-      setLoading(null);
+    if (id && status === "active") {
+      onUseNow?.(data);
+      router.push(`/main/mycoupon/${id}`);
+      return;
     }
+
+    onUseLater?.(data);
+    router.push("/main/mycoupon");
+  } catch (e: any) {
+    setError(e?.message ?? "Something went wrong");
+  } finally {
+    setLoading(null);
   }
+}
+
 
 
   useEffect(() => {

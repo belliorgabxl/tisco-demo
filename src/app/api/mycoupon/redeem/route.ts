@@ -15,7 +15,7 @@ import { REWARDS } from "@/resource/reward";
 import type { PointType } from "@/resource/constant";
 
 const RedeemSchema = z.object({
-  rewardId: z.string().min(1),
+  rewardId: z.string().min(1), // รับได้ทั้ง key หรือ "1","2"
   mode: z.enum(["now", "later"]),
 });
 
@@ -43,11 +43,19 @@ function getClientIp(req: Request) {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
 }
 
-/**
- * NOTE:
- * - later = save only (no spend, no stock, no history)
- * - now   = redeem/spend (spend + stock + history)
- */
+function resolveReward(input: string) {
+  const direct = (REWARDS as any)[input];
+  if (direct) return { rewardKey: input, reward: direct };
+  const entries = Object.entries(REWARDS as any);
+  const found = entries.find(
+    ([, r]) => String((r as any)?.id) === String(input),
+  );
+
+  if (found) return { rewardKey: found[0], reward: found[1] };
+
+  return { rewardKey: null as any, reward: null as any };
+}
+
 export async function POST(req: Request) {
   const token = getAuthToken(req);
   if (!token) {
@@ -81,8 +89,8 @@ export async function POST(req: Request) {
   }
 
   const { rewardId, mode } = parsed.data;
-  const reward = REWARDS[rewardId];
 
+  const { rewardKey, reward } = resolveReward(rewardId);
   if (!reward) {
     return NextResponse.json(
       { success: false, message: "Reward not found" },
@@ -90,28 +98,41 @@ export async function POST(req: Request) {
     );
   }
 
-  if (reward.rewardType !== "coupon" || reward.pointAction.mode !== "spend") {
+  if (reward.rewardType !== "coupon") {
     return NextResponse.json(
-      { success: false, message: "This reward is not a coupon/spend type" },
+      { success: false, message: "This reward is not a coupon type" },
       { status: 400 },
     );
   }
 
-  const pt = reward.pointAction.pointType;
-  const cost = reward.pointAction.amount;
+  // ✅ pointAction อาจยังไม่ชัวร์ → fallback ไป reward.points
+  const pa = reward.pointAction ?? {
+    mode: "spend",
+    pointType: "TISCO",
+    amount: Number(reward.points ?? 0),
+  };
+
+  if (pa.mode !== "spend") {
+    return NextResponse.json(
+      { success: false, message: "This reward is not a spend type" },
+      { status: 400 },
+    );
+  }
+
+  const pt = pa.pointType as PointType;
+  const cost = Number(pa.amount ?? 0);
 
   await connectDB();
 
   const userId = new mongoose.Types.ObjectId(decoded.userId);
   const now = new Date();
 
-  // --- ensure coupon catalog exists ---
-  let coupon = await Coupon.findOne({ rewardId });
+  // --- ensure coupon catalog exists (ใช้ rewardKey เป็นตัวหลัก) ---
+  let coupon = await Coupon.findOne({ rewardId: rewardKey });
 
   if (!coupon) {
-    // demo: create coupon from reward config (ปรับตามจริงได้)
     coupon = await Coupon.create({
-      rewardId,
+      rewardId: rewardKey,
       coupon_type: "voucher",
       stock: 999,
       status: CouponStatus.ACTIVE,
@@ -127,7 +148,7 @@ export async function POST(req: Request) {
     });
   }
 
-  // basic validations (ใช้ร่วมกันทั้ง now/later เพื่อไม่ให้ save ของหมดอายุ/ปิดการขาย)
+  // basic validations
   if (coupon.status !== CouponStatus.ACTIVE) {
     return NextResponse.json(
       { success: false, message: "Coupon inactive" },
@@ -141,103 +162,52 @@ export async function POST(req: Request) {
     );
   }
 
-  /**
-   * ✅ LATER: save only
-   * - no credit spend
-   * - no coupon stock update
-   * - no history
-   */
-  if (mode === "later") {
-    // optional: ถ้าอยากให้ save ได้แม้ stock = 0 ให้ลบเงื่อนไขนี้ออก
-    if (coupon.stock <= 0) {
-      return NextResponse.json(
-        { success: false, message: "Coupon out of stock" },
-        { status: 400 },
-      );
-    }
+  // ✅ กันกดซ้ำแบบ “ถ้ามีใบที่ยังใช้งาน/เก็บไว้” ให้คืนใบเดิม
+  // ถ้าคุณอยากให้ซื้อได้หลายใบ ให้ลบ block นี้ออก
+  const existing = await UserCoupon.findOne({
+    userId,
+    rewardId: reward.id, // ✅ คงรูปแบบเดิมของคุณ (reward.id)
+    status: { $in: [UserCouponStatus.REDEEMED, UserCouponStatus.ACTIVE] },
+  }).sort({ createdAt: -1 });
 
-    // กันการกดซ้ำ: ถ้ามี userCoupon ของ reward นี้ที่ยังไม่หมดอายุและยังไม่ถูกใช้ ให้คืนตัวเดิม
-    const existing = await UserCoupon.findOne({
-      userId,
-      rewardId: reward.id,
-      expiresAt: { $gt: now },
-      status: { $ne: UserCouponStatus.USED }, // ถ้า enum ไม่มี USED ก็ยังไม่พัง (Mongo จะ ignore unknown? ขึ้นกับ schema)
-    }).sort({ createdAt: -1 });
-
-    if (existing) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          userCouponId: String(existing._id),
-          couponCode: (existing as any).couponCode ?? undefined,
-          qrText: (existing as any).qrText ?? undefined,
-          expiresAt: existing.expiresAt,
-          mode: "later",
-          note: "Already saved",
-        },
-      });
-    }
-
-    const code = crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase();
-    const qrToken = crypto.randomUUID();
-
-    // ถ้าคุณมี enum SAVED อยู่แล้ว จะใช้ SAVED
-    // ถ้าไม่มี จะ fallback ไป REDEEMED (แนะนำให้เพิ่ม SAVED ทีหลังเพื่อความชัดเจน)
-    const savedStatus =
-      (UserCouponStatus as any).SAVED ?? UserCouponStatus.REDEEMED;
-
-    const userCoupon = await UserCoupon.create({
-      userId,
-
-      couponId: coupon._id,
-      rewardId: reward.id,
-      rewardTitle: reward.title,
-      rewardDesc: reward.desc,
-      rewardImage: reward.image,
-
-      pointType: pt,
-      pointCost: cost,
-
-      status: savedStatus,
-
-      couponCode: code,
-      qrText: `tisco-demo://coupon/${qrToken}`,
-
-      expiresAt: coupon.expired,
-      redeemedAt: new Date(),
-
-      metadata: {
-        rewardBadge: reward.badge,
-        couponId: String(coupon._id),
-        savedOnly: true, // ช่วยให้แยก later ชัด ๆ แม้ status จะเป็น REDEEMED
-      },
-    });
-
+  if (existing) {
+    // ถ้าเป็น ACTIVE แล้วหมดเวลา อันนี้ให้ปล่อยให้ /api/mycoupon/[id] ไปจัดการ expire
     return NextResponse.json({
       success: true,
       data: {
-        userCouponId: String(userCoupon._id),
-        couponCode: (userCoupon as any).couponCode ?? code,
-        qrText: (userCoupon as any).qrText ?? `tisco-demo://coupon/${qrToken}`,
-        expiresAt: userCoupon.expiresAt,
-        mode: "later",
+        userCouponId: String(existing._id),
+        couponCode: (existing as any).couponCode ?? undefined,
+        qrText: (existing as any).qrText ?? undefined,
+        activatedAt: (existing as any).activatedAt ?? null,
+        expiresAt: existing.expiresAt ?? null,
+        mode: existing.status === UserCouponStatus.ACTIVE ? "now" : "later",
+        note: "Already redeemed",
       },
     });
   }
 
-  /**
-   * ✅ NOW: redeem/spend (ตัดแต้มจริง)
-   * - spend credit
-   * - decrement stock
-   * - create history
-   * - create userCoupon ACTIVE
-   */
   const session = await mongoose.startSession();
 
   try {
     let resultData: any = null;
 
     await session.withTransaction(async () => {
+      // --- re-check & reserve stock inside tx ---
+      const updatedCoupon = await Coupon.findOneAndUpdate(
+        {
+          _id: coupon._id,
+          status: CouponStatus.ACTIVE,
+          stock: { $gt: 0 },
+          expired: { $gt: now },
+        },
+        { $inc: { stock: -1, redeemedCount: 1 } },
+        { session, returnDocument: "after" },
+      );
+
+      if (!updatedCoupon) {
+        throw new Error("Coupon out of stock / inactive / expired");
+      }
+
       // --- get/create credit (in tx) ---
       let credit = await Credit.findOne({ userId }).session(session);
 
@@ -257,74 +227,70 @@ export async function POST(req: Request) {
         credit = created[0];
       }
 
-      const field = pointField(pt);
-      const current = Number((credit as any)[field] ?? 0);
+      // --- spend points (ONLY if cost > 0) ---
+      if (cost > 0) {
+        const field = pointField(pt);
+        const current = Number((credit as any)[field] ?? 0);
 
-      // --- check balance ---
-      if (current < cost) {
-        // history failed (for NOW only)
-        await History.create(
-          [
-            {
-              userId,
-              type: HistoryType.COUPON_REDEEM,
-              status: HistoryStatus.FAILED,
-              pointChange: {
-                tiscoPoint: pt === "TISCO" ? -cost : 0,
-                twealthPoint: pt === "TWEALTH" ? -cost : 0,
-                tinsurePoint: pt === "TINSURE" ? -cost : 0,
+        if (current < cost) {
+          await History.create(
+            [
+              {
+                userId,
+                type: HistoryType.COUPON_REDEEM,
+                status: HistoryStatus.FAILED,
+                pointChange: {
+                  tiscoPoint: pt === "TISCO" ? -cost : 0,
+                  twealthPoint: pt === "TWEALTH" ? -cost : 0,
+                  tinsurePoint: pt === "TINSURE" ? -cost : 0,
+                },
+                balanceAfter: {
+                  tiscoPoint: Number((credit as any).tiscoPoint ?? 0),
+                  twealthPoint: Number((credit as any).twealthPoint ?? 0),
+                  tinsurePoint: Number((credit as any).tinsurePoint ?? 0),
+                },
+                description: `Redeem failed: insufficient ${pt} points`,
+                metadata: { rewardId: rewardKey, mode },
+                ipAddress: getClientIp(req),
+                userAgent: req.headers.get("user-agent") ?? undefined,
               },
-              balanceAfter: {
-                tiscoPoint: Number((credit as any).tiscoPoint ?? 0),
-                twealthPoint: Number((credit as any).twealthPoint ?? 0),
-                tinsurePoint: Number((credit as any).tinsurePoint ?? 0),
-              },
-              description: `Redeem failed: insufficient ${pt} points`,
-              metadata: { rewardId },
-              ipAddress: getClientIp(req),
-              userAgent: req.headers.get("user-agent") ?? undefined,
-            },
-          ],
-          { session },
-        );
+            ],
+            { session },
+          );
+          throw new Error("Insufficient points");
+        }
 
-        throw new Error("Insufficient points");
+        (credit as any)[field] = current - cost;
+
+        // totalPoints = sum
+        credit.totalPoints =
+          Number((credit as any).tiscoPoint ?? 0) +
+          Number((credit as any).twealthPoint ?? 0) +
+          Number((credit as any).tinsurePoint ?? 0);
+
+        await credit.save({ session });
       }
 
-      // --- re-check coupon inside tx (and stock) ---
-      const updatedCoupon = await Coupon.findOneAndUpdate(
-        {
-          _id: coupon._id,
-          status: CouponStatus.ACTIVE,
-          stock: { $gt: 0 },
-          expired: { $gt: now },
-        },
-        { $inc: { stock: -1, redeemedCount: 1 } },
-        { new: true, session },
-      );
-
-      if (!updatedCoupon) {
-        throw new Error("Coupon out of stock / inactive / expired");
-      }
-
-      // --- spend credit ---
-      (credit as any)[field] = current - cost;
-      credit.totalPoints =
-        Number((credit as any).tiscoPoint ?? 0) +
-        Number((credit as any).twealthPoint ?? 0) +
-        Number((credit as any).tinsurePoint ?? 0);
-      await credit.save({ session });
-
-      // --- create user coupon instance (ACTIVE) ---
-      const code = crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase();
+      // --- create user coupon instance ---
+      const code = crypto
+        .randomUUID()
+        .replace(/-/g, "")
+        .slice(0, 12)
+        .toUpperCase();
       const qrToken = crypto.randomUUID();
 
-      const userCoupon = await UserCoupon.create(
+      const isNow = mode === "now";
+      const activeExpiresAt = isNow
+        ? new Date(now.getTime() + 15 * 60 * 1000)
+        : null;
+
+      const createdUserCoupon = await UserCoupon.create(
         [
           {
             userId,
 
             couponId: updatedCoupon._id,
+
             rewardId: reward.id,
             rewardTitle: reward.title,
             rewardDesc: reward.desc,
@@ -333,24 +299,30 @@ export async function POST(req: Request) {
             pointType: pt,
             pointCost: cost,
 
-            status: UserCouponStatus.ACTIVE,
+            status: isNow ? UserCouponStatus.ACTIVE : UserCouponStatus.REDEEMED,
 
             couponCode: code,
             qrText: `tisco-demo://coupon/${qrToken}`,
 
-            expiresAt: updatedCoupon.expired,
-            redeemedAt: new Date(),
+            activatedAt: isNow ? now : null,
+            expiresAt: isNow ? activeExpiresAt : null,
+
+            redeemedAt: now,
+            usedAt: null,
 
             metadata: {
+              rewardKey,
               rewardBadge: reward.badge,
               couponId: String(updatedCoupon._id),
+              couponValidUntil: updatedCoupon.expired,
+              mode,
             },
           },
         ],
         { session },
       );
 
-      // --- history success (NOW only) ---
+      // --- history success (ทั้ง now และ later) ---
       await History.create(
         [
           {
@@ -369,8 +341,13 @@ export async function POST(req: Request) {
               tinsurePoint: Number((credit as any).tinsurePoint ?? 0),
             },
             description: `Redeem coupon: ${reward.title}`,
-            metadata: { rewardId, userCouponId: String(userCoupon[0]._id) },
-            transactionRef: `REDEEM-${rewardId}-${Date.now()}`,
+            metadata: {
+              rewardId: rewardKey,
+              rewardKey,
+              mode,
+              userCouponId: String(createdUserCoupon[0]._id),
+            },
+            transactionRef: `REDEEM-${rewardKey}-${Date.now()}`,
             ipAddress: getClientIp(req),
             userAgent: req.headers.get("user-agent") ?? undefined,
           },
@@ -379,20 +356,27 @@ export async function POST(req: Request) {
       );
 
       resultData = {
-        userCouponId: String(userCoupon[0]._id),
-        couponCode: (userCoupon[0] as any).couponCode ?? code,
-        qrText: (userCoupon[0] as any).qrText ?? `tisco-demo://coupon/${qrToken}`,
-        expiresAt: userCoupon[0].expiresAt,
-        mode: "now",
+        userCouponId: String(createdUserCoupon[0]._id),
+        couponCode: (createdUserCoupon[0] as any).couponCode ?? code,
+        qrText:
+          (createdUserCoupon[0] as any).qrText ??
+          `tisco-demo://coupon/${qrToken}`,
+
+        status: createdUserCoupon[0].status,
+        activatedAt: (createdUserCoupon[0] as any).activatedAt ?? null,
+        expiresAt: createdUserCoupon[0].expiresAt ?? null,
+
+        // เอาไว้โชว์ในหน้า mycoupon ว่าคูปองรวมหมดวันไหน
+        couponValidUntil: updatedCoupon.expired,
+
+        mode,
       };
     });
 
     return NextResponse.json({ success: true, data: resultData });
   } catch (e: any) {
     const message = e?.message ?? "Redeem failed";
-    const status =
-      message === "Insufficient points" ? 400 : 400;
-
+    const status = message === "Insufficient points" ? 400 : 400;
     return NextResponse.json({ success: false, message }, { status });
   } finally {
     session.endSession();
