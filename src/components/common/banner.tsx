@@ -275,15 +275,12 @@ export default function UserBanner({
               <span className="truncate text-base font-semibold tracking-tight text-white/95">
                 {user.name}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[11px] font-semibold text-sky-100 ring-1 ring-white/15">
+             
+            </div>
+            <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[11px] font-semibold text-sky-100 ring-1 ring-white/15">
                 <Crown className="h-3.5 w-3.5 text-sky-200" />
                 {user.tier}
               </span>
-            </div>
-            <div className="mt-0.5 text-xs text-white/70">
-              Member No
-              <br /> <span className="text-white/90">{user.memberNo}</span>
-            </div>
           </div>
 
           {/* notification */}

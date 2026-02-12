@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Field } from "@/components/common/field";
@@ -109,7 +109,7 @@ export default function RegisterPage() {
       setLoading(false);
     }
   }
-
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <main className="relative min-h-screen overflow-hidden flex justify-center px-4 py-6 text-sky-50">
       {/* Background */}
@@ -215,16 +215,33 @@ export default function RegisterPage() {
                 </Field>
 
                 <Field label="Password" required hint="อย่างน้อย 6 ตัวอักษร">
-                  <input
-                    className={inputBase}
-                    placeholder="••••••••"
-                    type="password"
-                    value={form.password}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, password: e.target.value }))
-                    }
-                    autoComplete="new-password"
-                  />
+                  <div className="relative">
+                    <input
+                      className={`${inputBase} pr-12`}
+                      placeholder="••••••••"
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, password: e.target.value }))
+                      }
+                      autoComplete="new-password"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 hover:text-slate-700"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
                 </Field>
               </div>
             </div>
