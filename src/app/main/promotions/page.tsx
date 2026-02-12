@@ -127,7 +127,7 @@ export default function PromotionPage() {
             return (
               <Link
                 key={p.id}
-                href={`/main/promotion/${p.id}`}
+                href={`/main/promotions/${p.id}`}
                 className="relative min-w-[86%] snap-start overflow-hidden rounded-xl border border-white/15 bg-white/10 backdrop-blur-xl
                 shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)]
                 hover:bg-white/15 active:scale-[0.995] transition"
