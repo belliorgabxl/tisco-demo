@@ -74,7 +74,7 @@ export default function BackOfficeNavbar({
 
          
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/20 bg-white/15 backdrop-blur-2xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/20 bg-gray-700/50 backdrop-blur-2xl shadow-[0_14px_30px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
                   <div className="p-3 border-b border-white/10">
                     <p className="text-sm font-bold text-white/95">Admin User</p>
                     <p className="text-xs text-white/60">Super Admin</p>
